@@ -237,7 +237,7 @@
           <img src="${product.imageUrl || product.img}" alt="${product.name}" onerror="this.src='https://via.placeholder.com/150'">
           <h3>${product.name}</h3>
           <div class="price">${product.price} دج</div>
-          <div class="pack">الكمية في العلبة: ${product.pack || 1}</div>
+          <div class="pack">الكمية: ${product.pack || 1}</div>
           <div style="font-size:13px; color:#888;">
             ثمن الوحدة: ${(product.price / (product.pack || 1)).toFixed(2)} دج
           </div>
