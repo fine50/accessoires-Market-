@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>Accessoires Market</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      direction: rtl;
+      text-align: center;
+    }
+
+    .store-header {
+      font-size: 30px;
+      font-weight: 700;
+      font-family: 'Cairo', sans-serif;
+      background: linear-gradient(90deg, #007cf0, #00dfd8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin: 30px auto;
+    }
+
+    .products-container {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      padding: 20px;
+      justify-items: center;
+      max-width: 100%;
+      box-sizing: border-box;
+    }
+
+    @media (min-width: 768px) {
+      .products-container {
+        grid-template-columns: repeat(5, 1fr);
+      }
+    }
+
+    .product {
+      background-color: #fff;
+      border-radius: 16px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      padding: 16px;
+      width: 100%;
+      max-width: 180px;
+      box-sizing: border-box;
+      text-align: center;
+      transition: transform 0.2s ease;
+      font-family: 'Cairo', sans-serif;
+    }
+
+    .product:hover {
+      transform: translateY(-5px);
+    }
+
+    .product img {
+      width: 100%;
+      height: 140px;
+      object-fit: cover;
+      border-radius: 12px;
+      margin-bottom: 10px;
+      cursor: pointer;
+    }
+
+    .product h3 {
+      margin: 8px 0 4px;
+      font-size: 17px;
+      color: #333;
+    }
+
+    .product .price {
+      color: #28a745;
+      font-weight: bold;
+      font-size: 15px;
+    }
+
+    .product .pack {
+      font-size: 14px;
+      color: #777;
+    }
+
+    .product input[type="number"] {
+      width: 80px;
+      margin-top: 8px;
+      padding: 6px;
+      font-size: 13px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      text-align: center;
+      font-family: 'Cairo', sans-serif;
+    }
+
+    #cartBtn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 60px;
+      height: 60px;
+      background-color: lightgreen;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      font-size: 26px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      transition: background-color 0.3s ease;
+    }
+
+    #cartBtn:hover {
+      background-color: #32cd32;
+    }
+
+    .page-btn {
+      display: inline-block;
+      width: 36px;
+      height: 36px;
+      margin: 5px;
+      border-radius: 50%;
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background-color 0.3s ease;
+    }
+
+    .page-btn:hover, .page-btn.active {
+      background-color: #3498db;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- صورة الغلاف -->
+  <div id="coverBanner" style="margin: 20px;">
+    <img id="coverImage" src="" style="width: 100%; max-height: 200px; object-fit: cover; border-radius: 12px;" />
+  </div>
+
+  <h1 class="store-header">Accessoires Market</h1>
+  
+  <div class="products-container" id="productsContainer"></div>
+  <div id="pagination" style="margin-top: 20px; text-align: center;"></div>
+
+
+  <!-- زر السلة -->
+  <button id="cartBtn">
+    🛒
+    <span id="cartCountBadge" style="position: absolute; top: -5px; right: -5px; background-color: red; color: white; font-size: 13px; padding: 2px 6px; border-radius: 50%; display: none;"></span>
+  </button>
+
+  <!-- نافذة تكبير الصورة -->
+  <div id="imageModal" style="display:none; position:fixed; inset:0; background-color:rgba(0,0,0,0.8); z-index:2000; align-items:center; justify-content:center;">
+    <img id="modalImage" src="" style="max-width:90%; max-height:90%; border-radius:10px; box-shadow:0 0 20px rgba(0,0,0,0.5);" />
+  </div>
+
+
+  <!-- سكربت Firebase والمنطق -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+    import { getDatabase, ref, onValue, push } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+
+    // إعدادات Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyCCFoylxNOwfAVAebuAm1AZuomZ07Pbfdg",
+      authDomain: "shopyan-e272b.firebaseapp.com",
+      databaseURL: "https://shopyan-e272b-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "shopyan-e272b",
+      storageBucket: "shopyan-e272b.firebasestorage.app",
+      messagingSenderId: "479167380491",
+      appId: "1:479167380491:web:1d6d4dc138ea6ea0c01b0e",
+      measurementId: "G-SEYFWETTCX"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const productsRef = ref(db, 'products');
+    const coverRef = ref(db, 'store/cover');
+
+    // عرض الغلاف
+    onValue(coverRef, (snapshot) => {
+      const data = snapshot.val();
+      const img = document.getElementById("coverImage");
+      if (img && data && data.url) {
+        img.src = data.url;
+      }
+    });
+
+    const container = document.getElementById('productsContainer');
+    let currentPage = 1;
+    const productsPerPage = 20;
+    let allVisibleProducts =[];
+    let cart =[];
+
+    // جلب المنتجات (الرابط imageUrl سيعمل مباشرة دون Supabase)
+    onValue(productsRef, (snapshot) => {
+      const data = snapshot.val() || {};
+      allVisibleProducts = Object.entries(data)
+  .filter(([_, p]) => p && !p.hidden)
+  .map(([id, p]) => ({
+    id: id,
+    name: p.name,
+    price: p.price,
+    pack: p.pack,
+    serial: p.serial || "",
+    imageUrl: p.imageUrl,
+    img: p.img
+  }));
+      renderProducts();
+      renderPagination();
+    });
+
+    function renderProducts() {
+      container.innerHTML = '';
+      const startIndex = (currentPage - 1) * productsPerPage;
+      const endIndex = startIndex + productsPerPage;
+      const productsToShow = allVisibleProducts.slice(startIndex, endIndex);
+
+      if (productsToShow.length === 0) {
+        container.innerHTML = '<p>لا توجد منتجات متاحة حالياً.</p>';
+        return;
+      }
+
+      productsToShow.forEach(product => {
+        const div = document.createElement('div');
+        div.className = 'product';
+        
+        // الصورة هنا تقرأ الرابط العام الذي رفعه كود الإدارة
+        div.innerHTML = `
+          <img src="${product.imageUrl || product.img}" alt="${product.name}" onerror="this.src='https://via.placeholder.com/150'">
+          <h3>${product.name}</h3>
+          <div class="price">${product.price} دج</div>
+          <div class="pack">الكمية في العلبة: ${product.pack || 1}</div>
+          <div style="font-size:13px; color:#888;">
+            ثمن الوحدة: ${(product.price / (product.pack || 1)).toFixed(2)} دج
+          </div>
+          <input type="number" id="qty-${product.id}" placeholder="الكمية" min="0" />
+        `;
+
+        const qtyInput = div.querySelector(`#qty-${product.id}`);
+        const savedItem = cart.find(p => p.id === product.id);
+        if (savedItem) {
+          qtyInput.value = savedItem.quantity;
+        }
+
+        qtyInput.addEventListener('input', () => {
+          const value = qtyInput.value.trim();
+          const quantity = parseInt(value);
+          const existingIndex = cart.findIndex(item => item.id === product.id);
+
+          if (value === '' || isNaN(quantity) || quantity <= 0) {
+            if (existingIndex !== -1) cart.splice(existingIndex, 1);
+          } else {
+            if (existingIndex !== -1) {
+              cart[existingIndex].quantity = quantity;
+            } else {
+              const realProduct = allVisibleProducts.find(p => p.id === product.id);
+
+cart.push({
+  id: product.id,
+  name: product.name,
+  serial: realProduct ? realProduct.serial : "",
+  price: product.price,
+  quantity: quantity
+});
+            }
+          }
+          localStorage.setItem("cart", JSON.stringify(cart));
+          if (document.getElementById("cartModal").style.display === 'flex') renderCart();
+          updateCartCountBadge();
+        });
+
+        container.appendChild(div);
+      });
+    }
+
+    function renderPagination() {
+      const totalPages = Math.ceil(allVisibleProducts.length / productsPerPage);
+      const paginationContainer = document.getElementById("pagination");
+      if (!paginationContainer) return;
+
+      paginationContainer.innerHTML = '';
+
+      const prevBtn = document.createElement("button");
+      prevBtn.textContent = "«";
+      prevBtn.className = "page-btn";
+      prevBtn.disabled = currentPage === 1;
+      prevBtn.onclick = () => { currentPage--; renderProducts(); renderPagination(); };
+      paginationContainer.appendChild(prevBtn);
+
+      for (let i = 1; i <= totalPages; i++) {
+        const btn = document.createElement("button");
+        btn.textContent = i;
+        btn.className = "page-btn";
+        if (i === currentPage) btn.classList.add("active");
+        btn.onclick = () => { currentPage = i; renderProducts(); renderPagination(); };
+        paginationContainer.appendChild(btn);
+      }
+
+      const nextBtn = document.createElement("button");
+      nextBtn.textContent = "»";
+      nextBtn.className = "page-btn";
+      nextBtn.disabled = currentPage === totalPages;
+      nextBtn.onclick = () => { currentPage++; renderProducts(); renderPagination(); };
+      paginationContainer.appendChild(nextBtn);
+    }
+
+    try {
+      const savedCart = localStorage.getItem("cart");
+      if (savedCart) cart = JSON.parse(savedCart);
+      updateCartCountBadge();
+    } catch (e) {
+      cart =[];
+    }
+
+    function updateCartCountBadge() {
+      const badge = document.getElementById("cartCountBadge");
+      const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+      if (totalItems > 0) {
+        badge.textContent = totalItems;
+        badge.style.display = "inline-block";
+      } else {
+        badge.style.display = "none";
+      }
+    }
+
+    window.showCartModal = function() {
+      renderCart();
+      document.getElementById("cartModal").style.display = 'flex';
+    };
+
+    window.renderCart = function() {
+      const cartItemsEl = document.getElementById("cartItems");
+      cartItemsEl.innerHTML = "";
+      let total = 0;
+
+      cart.forEach((item) => {
+        const itemTotal = item.price * item.quantity;
+        total += itemTotal;
+        const div = document.createElement("div");
+        div.style.cssText = "font-size:14px; padding:4px 0; font-family:'Cairo', sans-serif; color:#333; border-bottom:1px solid #f0f0f0;";
+        div.innerHTML = `
+          ${item.name} 
+          <span style="color:#007bff;">× ${item.quantity}</span> 
+          = <span style="color:#28a745;">${itemTotal.toLocaleString('ar-DZ')} دج</span>
+        `;
+        cartItemsEl.appendChild(div);
+      });
+
+      document.getElementById("cartTotal").textContent = `المجموع: ${total.toLocaleString('ar-DZ')} دج`;
+    };
+
+    // إرسال الطلب
+    document.getElementById("sendOrder").onclick = () => {
+      const name = document.getElementById("name").value.trim();
+      const phone = document.getElementById("phone").value.trim();
+      const address = document.getElementById("address").value.trim();
+      
+
+      if (!name || !phone || !address || cart.length === 0) {
+        alert("يرجى ملء جميع الخانات وإضافة منتجات إلى السلة.");
+        return;
+      }
+
+      const totalPrice = cart.reduce((sum, p) => sum + (p.price * p.quantity), 0);
+      const orderData = {
+        customerName: name,
+        phone: phone,
+        address: address,
+        items: cart,
+        totalPrice: totalPrice,
+        status: 'pending',
+        timestamp: Date.now(),
+        createdAt: new Date().toLocaleString('ar-DZ')
+      };
+
+      const btn = document.getElementById("sendOrder");
+      btn.disabled = true;
+      btn.textContent = "جاري الإرسال...";
+
+      const ordersRef = ref(db, 'orders');
+      push(ordersRef, orderData)
+        .then(() => {
+          alert("✅ تم إرسال طلبك بنجاح! سنتواصل معك قريباً.");
+          // تنظيف السلة بعد الطلب الناجح
+          localStorage.removeItem("cart");
+          cart = [];
+          document.getElementById("cartModal").style.display = 'none';
+          renderCart();
+          renderProducts();
+          location.reload(); // تحديث الصفحة
+        })
+        .catch((error) => {
+          console.error(error);
+          alert("❌ حدث خطأ أثناء إرسال الطلب. حاول مرة أخرى.");
+        });
+    };
+
+    document.getElementById("cartBtn").addEventListener("click", showCartModal);
+  </script>
+
+  <!-- نافذة السلة -->
+  <div id="cartModal" style="display:none; position:fixed; inset:0; background-color:rgba(0,0,0,0.4); z-index:1000; align-items:center; justify-content:center;">
+    <div style="background:#fff; padding:20px; border-radius:16px; width:90%; max-width:380px; box-shadow:0 8px 20px rgba(0,0,0,0.3); font-family:'Cairo', sans-serif; text-align:right;">
+      <h2 style="margin:0 0 16px; color:#3498db; font-size:20px; text-align:center;">ملخص الطلب</h2>
+      <div id="cartItems" style="margin-bottom:15px; font-size:14px; color:#333; max-height:180px; overflow-y:auto;"></div>
+
+      <hr style="margin:12px 0; border:none; border-top:1px solid #ccc;" />
+
+      <input id="name" type="text" placeholder="الاسم الكامل" style="width:100%; margin-bottom:10px; padding:10px; border:1px solid #ccc; border-radius:10px; font-size:14px;" />
+      <input id="phone" type="tel" placeholder="رقم الهاتف" style="width:100%; margin-bottom:10px; padding:10px; border:1px solid #ccc; border-radius:10px; font-size:14px; direction: rtl; text-align: right;" />
+      <input id="address" type="text" placeholder="العنوان" style="width:100%; margin-bottom:15px; padding:10px; border:1px solid #ccc; border-radius:10px; font-size:14px;" />
+
+      <div id="cartTotal" style="font-weight:bold; margin-bottom:10px; text-align:center; color:#444;"></div>
+
+      <!-- تم تغيير النص والوظيفة للزر -->
+      <button id="sendOrder" style="background:#007bff; color:white; padding:12px; width:100%; border:none; border-radius:10px; font-size:15px; font-weight:600; cursor:pointer; transition:0.3s;">
+        تأكيد الطلب
+      </button>
+
+    </div>
+  </div>
+
+  <script>
+    // دوال مساعدة خارج الـ Module
+    const cartModal = document.getElementById("cartModal");
+    if (cartModal) {
+      cartModal.addEventListener("click", function (e) {
+        if (e.target === cartModal) {
+          cartModal.style.display = "none";
+        }
+      });
+    }
+
+    document.addEventListener("click", function (e) {
+      if (e.target.tagName === "IMG" && e.target.closest(".product")) {
+        const modal = document.getElementById("imageModal");
+        const modalImg = document.getElementById("modalImage");
+        modalImg.src = e.target.src;
+        modal.style.display = "flex";
+      }
+    });
+
+    const imageModal = document.getElementById("imageModal");
+    imageModal.addEventListener("click", function (e) {
+      if (e.target === imageModal) {
+        imageModal.style.display = "none";
+      }
+    });
+
+    if (performance.navigation.type === 1) {
+       // يمكنك تفعيل هذا السطر إذا كنت تريد مسح السلة عند التحديث
+       // localStorage.removeItem('cart');
+    }
+  </script>
+
+  <p style="font-family: system-ui, sans-serif; font-size: 14px; color: #888; font-weight: 300; margin: 16px 0;">
+     يمكنكم الاتصال بنا على
+    <a href="tel:0540322701" style="color: #007bff; text-decoration: none; font-weight: 300;">
+      0550852504
+    </a>
+  </p>
+  <footer style="font-family: 'Cairo', sans-serif; font-weight: 600; font-size: 20px; color: #3498db; text-align: center; padding: 20px 10px; line-height: 1.1;">
+    <div style="margin-bottom: 2px;">accessoires</div>
+    <div style="margin-bottom: 2px;">market</div>
+    <div style="width: 140px; height: 2px; background-color: #3498db; margin: 2px auto 0 auto; border-radius: 2px;"></div>
+  </footer>
+
+</body>
+</html>

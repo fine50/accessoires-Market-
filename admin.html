@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8" />
+  <title>market Owner - لوحة التحكم</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      direction: rtl;
+      text-align: center;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding-bottom: 100px;
+    }
+
+    .admin-header {
+      font-size: 32px;
+      font-weight: 700;
+      font-family: 'Cairo', sans-serif;
+      background: linear-gradient(90deg, #007cf0, #00dfd8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin: 20px auto;
+    }
+
+    .tabs-container {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .tab-btn {
+      padding: 10px 20px;
+      border: none;
+      background: #e0e0e0;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: 'Cairo', sans-serif;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+
+    .tab-btn.active {
+      background: #007cf0;
+      color: white;
+    }
+
+    .products-container {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      padding: 10px;
+    }
+
+    @media (min-width: 992px) {
+      .products-container {
+        grid-template-columns: repeat(5, 1fr);
+      }
+    }
+
+    .product {
+      background-color: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      padding: 15px;
+      text-align: center;
+    }
+
+    .product img {
+      width: 100%;
+      height: 140px;
+      object-fit: cover;
+      border-radius: 12px;
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    .product h3 {
+      font-size: 16px;
+      margin: 8px 0 4px;
+      color: #333;
+    }
+
+    .product .price {
+      font-size: 14px;
+      color: #27ae60;
+      font-weight: bold;
+    }
+
+    .product button {
+      margin: 5px;
+      padding: 5px 10px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .edit-btn {
+      background-color: #3498db;
+      color: white;
+    }
+
+    .delete-btn {
+      background-color: #e74c3c;
+      color: white;
+    }
+
+    .order-card {
+      background: white;
+      margin: 10px auto;
+      padding: 15px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      width: 90%;
+      max-width: 600px;
+      text-align: right;
+      border-right: 5px solid #007cf0;
+    }
+
+    .order-header {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 8px;
+      margin-bottom: 8px;
+      font-weight: bold;
+      gap: 10px;
+    }
+
+    .order-items {
+      background: #f9f9f9;
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    .order-footer {
+      margin-top: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .action-btn {
+      padding: 10px 16px;
+      font-size: 14px;
+      border-radius: 10px;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    .hidden-product {
+      opacity: 0.45;
+    }
+  </style>
+</head>
+<body>
+
+  <div style="position:fixed;top:15px;left:15px;z-index:2000;">
+
+<button onclick="toggleMenu()" 
+style="background:#3498db;color:white;border:none;border-radius:50%;width:45px;height:45px;font-size:20px;cursor:pointer;">
+⚙️
+</button>
+
+<div id="adminMenu" 
+style="display:none;position:absolute;top:55px;left:0;background:white;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,0.2);padding:10px;min-width:150px;">
+
+<button onclick="openCoverUpload()" 
+style="width:100%;padding:8px;border:none;background:#3498db;color:white;border-radius:6px;margin-bottom:6px;cursor:pointer;">
+🖼️ تغيير الغلاف
+</button>
+
+<button onclick="logout()" 
+style="width:100%;padding:8px;border:none;background:#e74c3c;color:white;border-radius:6px;cursor:pointer;">
+🚪 خروج
+</button>
+
+</div>
+
+</div>
+
+  <button
+    id="addProductBtn"
+    style="position: fixed; bottom: 20px; right: 20px; z-index: 1100; background-color: #3498db; color: white; border: none; border-radius: 50%; width: 56px; height: 56px; font-size: 28px; cursor: pointer; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); display:none;"
+  >
+    +
+  </button>
+
+  <h1 class="admin-header">لوحة التحكم</h1>
+
+  <div class="tabs-container" id="tabsContainer" style="display:none;">
+    <button class="tab-btn active" onclick="switchTab('products', this)">📦 المنتجات</button>
+    <button class="tab-btn" onclick="switchTab('orders', this)" style="position:relative;">
+
+  🔔 الطلبات الواردة
+  
+  <span id="ordersBadge" style="
+position:absolute;
+top:-6px;
+left:-6px;
+background:red;
+color:white;
+border-radius:50%;
+padding:2px 6px;
+font-size:11px;
+display:none;
+">
+    0
+  </span>
+  
+</button>
+
+<button class="tab-btn" onclick="switchTab('confirmed', this)">
+  📦 الطلبات المؤكدة
+</button>
+
+</div>
+
+<div id="productsSection">
+    <div style="text-align: center; margin: 20px 0;">
+      <input
+        type="text"
+        id="searchInput"
+        placeholder="ابحث عن منتج..."
+        style="padding: 10px; width: 80%; max-width: 300px; border: 1px solid #ccc; border-radius: 8px; font-family: 'Cairo', sans-serif;"
+      />
+    </div>
+
+    <div id="coverBanner" style="margin: 20px;">
+      <img
+        id="coverImage"
+        src=""
+        style="width:100%;max-height:200px;object-fit:cover;border-radius:12px;"
+        alt="صورة الغلاف"
+      />
+      <input
+type="file"
+id="coverFile"
+accept="image/*"
+style="display:none;">
+    </div>
+
+    <div class="products-container" id="productsContainer"></div>
+    <div id="pagination" style="margin-top: 20px;"></div>
+  </div>
+
+  
+
+
+<div id="ordersSection" style="display:none;">
+  
+  <h3 style="color:#555;">الطلبات الواردة</h3>
+  
+  <div id="ordersContainer" style="padding-bottom:50px;">
+    <p>جاري تحميل الطلبات...</p>
+  </div>
+  
+</div>
+
+  
+
+
+<div id="confirmedSection" style="display:none;">
+  
+  <h3 style="color:#555;">الطلبات المؤكدة</h3>
+
+<button onclick="deleteAllConfirmed()" 
+style="margin-bottom:15px;background:#e74c3c;color:white;border:none;padding:10px 15px;border-radius:8px;cursor:pointer;">
+🗑️ حذف جميع الطلبات المؤكدة
+</button>
+  
+  <div id="confirmedOrdersContainer" style="padding-bottom:50px;">
+    <p>جاري تحميل الطلبات...</p>
+  </div>
+  
+</div>
+
+  <div
+    id="successMessage"
+    style="display:none;position:fixed;top:30px;left:50%;transform:translateX(-50%);background:#4CAF50;color:white;padding:12px 24px;border-radius:12px;box-shadow:0 8px 20px rgba(0,0,0,0.3);z-index:2000;font-size:17px;"
+  >
+    ✅ تمت العملية بنجاح
+  </div>
+
+  <div
+    id="loginModal"
+    style="display:flex;justify-content:center;align-items:center;position:fixed;inset:0;background:linear-gradient(135deg,#74ebd5,#ACB6E5);z-index:3000;"
+  >
+    <div style="background:white;padding:30px;border-radius:16px;box-shadow:0 10px 25px rgba(0,0,0,0.3);width:90%;max-width:400px;text-align:center;">
+      <h2 style="margin-bottom: 20px;">الإدارة</h2>
+      <input
+        type="password"
+        id="adminPassword"
+        placeholder="أدخل كلمة السر"
+        style="width: 100%; padding: 12px; margin-bottom: 16px; border:1px solid #ccc; border-radius:8px;"
+      >
+      <button
+        onclick="checkPassword()"
+        style="width: 100%; padding: 12px; background-color: #007bff; color: white; border: none; border-radius: 8px; cursor: pointer;"
+      >
+        دخول
+      </button>
+    </div>
+  </div>
+
+  <div
+    id="addProductModal"
+    onclick="closeModalOnClickOutside(event)"
+    style="display: none; position: fixed; inset:0; background-color: rgba(0,0,0,0.5); z-index: 1001; justify-content: center; align-items: center;"
+  >
+    <div
+      style="background: white; padding: 24px 20px; border-radius: 16px; width: 90%; max-width: 420px; position: relative;"
+      onclick="event.stopPropagation()"
+    >
+      <span
+        style="position: absolute; top: 10px; left: 15px; font-size: 22px; cursor: pointer; color: #aaa;"
+        onclick="closeModal()"
+      >
+        ×
+      </span>
+
+      <h2 id="formTitle" style="margin-bottom: 18px; color: #3498db; text-align: center;">إضافة منتج جديد</h2>
+
+      <form id="addProductForm" style="display: flex; flex-direction: column; gap: 12px; align-items: center;">
+        <input type="hidden" id="editIndex">
+        <input type="hidden" id="existingImgUrl">
+        <input type="hidden" id="existingHidden">
+<input
+type="text"
+id="serial"
+placeholder="الرقم التسلسلي للمنتج"
+style="width:100%; padding:8px; border:1px solid #ccc; border-radius:6px;">
+        <input type="text" id="name" placeholder="اسم المنتج" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 6px;">
+        <input type="number" id="price" placeholder="السعر" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 6px;">
+        <input type="number" id="pack" placeholder="الكمية في العلبة" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 6px;">
+
+        <div style="width: 100%; text-align: right;">
+          <label style="font-size: 13px;">صورة المنتج:</label>
+          <div style="display:flex; gap:10px; margin-top:5px;">
+
+<input
+type="file"
+id="imageFile"
+accept="image/*"
+style="flex:1; padding:6px; border:1px solid #ccc; border-radius:6px;">
+
+<label
+for="cameraInput"
+style="flex:1; background:#3498db; color:white; border-radius:6px; padding:6px; text-align:center; cursor:pointer;">
+📷 تصوير
+</label>
+
+<input
+type="file"
+id="cameraInput"
+accept="image/*"
+capture="environment"
+style="display:none;">
+
+</div>
+          <p id="uploadStatus" style="font-size:12px; color:orange; display:none;">جاري رفع البيانات...</p>
+        </div>
+
+        <div style="margin-top: 10px; display: flex; gap: 10px;">
+          <button type="submit" class="action-btn">حفظ</button>
+          <button
+            type="button"
+            id="toggleVisibilityBtn"
+            onclick="toggleVisibility()"
+            style="display: none; background-color: orange; color: white; padding: 8px 22px; border:none; border-radius:6px; cursor:pointer;"
+          >
+            إخفاء المنتج
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+    import {
+  getDatabase,
+  ref,
+  onValue,
+  set,
+  remove,
+  update,
+  push,
+  get
+} from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCCFoylxNOwfAVAebuAm1AZuomZ07Pbfdg",
+      authDomain: "shopyan-e272b.firebaseapp.com",
+      databaseURL: "https://shopyan-e272b-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "shopyan-e272b",
+      storageBucket: "shopyan-e272b.firebasestorage.app",
+      messagingSenderId: "479167380491",
+      appId: "1:479167380491:web:1d6d4dc138ea6ea0c01b0e",
+      measurementId: "G-SEYFWETTCX"
+    };
+
+    const SUPABASE_URL = "https://petuxlimzsnskyjelbek.supabase.co";
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBldHV4bGltenNuc2t5amVsYmVrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI5MDg5NjgsImV4cCI6MjA4ODQ4NDk2OH0.2_cb-Ov_qTm7dpEISQcTvtIZMMC2EKRol6FsWw_jXpw";
+    const SUPABASE_BUCKET = "products";
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const productsRef = ref(db, "products");
+    const ordersRef = ref(db, "orders");
+    const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    let allProducts = {};
+    let filteredProducts = {};
+    let currentPage = 1;
+    const productsPerPage = 20;
+
+    function escapeHtml(text) {
+      const div = document.createElement("div");
+      div.textContent = text ?? "";
+      return div.innerHTML;
+    }
+
+    function showSuccess(message = "✅ تمت العملية بنجاح") {
+      const msg = document.getElementById("successMessage");
+      msg.textContent = message;
+      msg.style.display = "block";
+      setTimeout(() => {
+        msg.style.display = "none";
+      }, 3000);
+    }
+
+    function resetProductForm() {
+      document.getElementById("addProductForm").reset();
+      document.getElementById("editIndex").value = "";
+      document.getElementById("existingImgUrl").value = "";
+      document.getElementById("existingHidden").value = "false";
+      document.getElementById("formTitle").textContent = "إضافة منتج جديد";
+      document.getElementById("toggleVisibilityBtn").style.display = "none";
+      document.getElementById("uploadStatus").style.display = "none";
+    }
+
+    function getCurrentProductsList() {
+      return filteredProducts;
+    }
+
+    function renderPagination(totalPages, page) {
+      const pagination = document.getElementById("pagination");
+      pagination.innerHTML = "";
+
+      if (totalPages <= 1) return;
+
+      for (let i = 1; i <= totalPages; i++) {
+        const btn = document.createElement("button");
+        btn.textContent = i;
+        btn.style.cssText = `
+          margin: 5px;
+          padding: 8px 12px;
+          border: none;
+          border-radius: 50%;
+          background-color: ${i === page ? "#007bff" : "#e0e0e0"};
+          color: ${i === page ? "white" : "black"};
+          cursor: pointer;
+        `;
+        btn.onclick = () => showPage(i);
+        pagination.appendChild(btn);
+      }
+    }
+
+    function renderProductsPage(page) {
+      const container = document.getElementById("productsContainer");
+      container.innerHTML = "";
+
+      const source = getCurrentProductsList();
+      const productsArray = Object.entries(source);
+
+      const totalPages = Math.max(1, Math.ceil(productsArray.length / productsPerPage));
+      if (page > totalPages) page = 1;
+
+      const start = (page - 1) * productsPerPage;
+      const end = start + productsPerPage;
+      const pageItems = productsArray.slice(start, end);
+
+      if (pageItems.length === 0) {
+        container.innerHTML = "<p>لا توجد منتجات.</p>";
+        renderPagination(0, 1);
+        return;
+      }
+
+      pageItems.forEach(([id, product]) => {
+        const div = document.createElement("div");
+        div.className = "product";
+
+        if (product.hidden) {
+          div.classList.add("hidden-product");
+        }
+
+        const imageSrc = product.imageUrl ? product.imageUrl : "https://via.placeholder.com/150";
+
+        div.innerHTML = `
+          <img src="${imageSrc}"
+            alt="${escapeHtml(product.name || "")}"
+            onerror="this.src='https://via.placeholder.com/150'"
+          >
+          <h3>${escapeHtml(product.name || "")}</h3>
+          <div class="price">${Number(product.price || 0)} دج</div>
+          <div>علبة: ${Number(product.pack || 0)}</div>
+          <button class="edit-btn" onclick="editProduct('${id}')">تعديل</button>
+          <button class="delete-btn" onclick="deleteProduct('${id}')">حذف</button>
+        `;
+
+        container.appendChild(div);
+      });
+
+      renderPagination(totalPages, page);
+    }
+
+    function showPage(page) {
+      currentPage = page;
+      renderProductsPage(page);
+    }
+
+    function applySearchFilter() {
+      const searchTerm = document.getElementById("searchInput").value.trim().toLowerCase();
+
+      if (!searchTerm) {
+        filteredProducts = { ...allProducts };
+      } else {
+        filteredProducts = Object.fromEntries(
+          Object.entries(allProducts).filter(([_, product]) =>
+            (product.name || "").toLowerCase().includes(searchTerm) ||
+  (product.serial || "").toLowerCase().includes(searchTerm)
+          )
+        );
+      }
+
+      currentPage = 1;
+      renderProductsPage(currentPage);
+    }
+
+    async function uploadImageToSupabase(file) {
+      const cleanFileName = file.name.replace(/[^a-zA-Z0-9._-]/g, "");
+      const filePath = `${Date.now()}_${cleanFileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from(SUPABASE_BUCKET)
+        .upload(filePath, file, {
+          cacheControl: "3600",
+          upsert: true
+        });
+
+      if (uploadError) {
+        console.error("Supabase upload error:", uploadError);
+
+        if (uploadError.message?.toLowerCase().includes("bucket not found")) {
+          throw new Error(`Bucket باسم "${SUPABASE_BUCKET}" غير موجود داخل Supabase Storage.`);
+        }
+
+        if (uploadError.message?.toLowerCase().includes("row-level security")) {
+          throw new Error("سياسات Supabase تمنع رفع الصورة. تحقق من Policies الخاصة بالرفع.");
+        }
+
+        throw new Error("فشل رفع الصورة: " + uploadError.message);
+      }
+
+      const { data } = supabase.storage
+  .from(SUPABASE_BUCKET)
+  .getPublicUrl(filePath);
+
+const publicUrl = data.publicUrl;
+
+      if (!publicUrl) {
+        throw new Error("تم رفع الصورة لكن تعذر إنشاء الرابط العام.");
+      }
+
+      console.log("Public URL:", publicUrl);
+      return publicUrl;
+    }
+
+    onValue(productsRef, (snapshot) => {
+      allProducts = snapshot.val() || {};
+      filteredProducts = { ...allProducts };
+      applySearchFilter();
+    });
+
+    onValue(ordersRef, (snapshot) => {
+  
+  const ordersContainer = document.getElementById("ordersContainer");
+  const badge = document.getElementById("ordersBadge");
+  
+  const ordersData = snapshot.val();
+  const ordersCount = ordersData ? Object.keys(ordersData).length : 0;
+  
+  if (ordersCount > 0) {
+    badge.style.display = "inline-block";
+    badge.textContent = ordersCount;
+  } else {
+    badge.style.display = "none";
+  }
+  
+  ordersContainer.innerHTML = "";
+  
+  if (!ordersData) {
+    ordersContainer.innerHTML = '<p style="text-align:center; margin-top:20px;">لا توجد طلبات جديدة.</p>';
+    return;
+  }
+  
+  Object.entries(ordersData).reverse().forEach(([key, order]) => {
+    
+    let itemsHtml = "";
+    
+    if (Array.isArray(order.items)) {
+      order.items.forEach((item) => {
+        const serialText = item.serial ? item.serial : "لا يوجد";
+
+itemsHtml += `
+<div style="margin-bottom:6px;">
+  <div>📦 المنتج: ${item.name}</div>
+  <div>🔢 السيريال: ${serialText}</div>
+  <div>📦 الكمية: ${item.quantity}</div>
+</div>
+`;
+      });
+    }
+    
+    ordersContainer.innerHTML += `
+      <div class="order-card">
+        <div class="order-header">
+          <span>👤 ${order.customerName}</span>
+        </div>
+
+        <div>📞 ${order.phone}</div>
+        <div>🏠 ${order.address}</div>
+
+        <div class="order-items">
+          ${itemsHtml}
+        </div>
+
+        <div style="margin-top:10px;font-weight:bold;">
+          💰 ${order.totalPrice} دج
+        </div>
+
+        <div class="order-footer">
+          <button onclick="deleteOrder('${key}')" style="background:#e74c3c;color:white;border:none;padding:8px 12px;border-radius:6px;">
+            🗑️ حذف الطلب
+          </button>
+
+          <button onclick="confirmOrder('${key}')" style="background:#27ae60;color:white;border:none;padding:8px 12px;border-radius:6px;">
+            ✅ تأكيد الطلب
+          </button>
+        </div>
+      </div>
+    `;
+  });
+  
+});
+onValue(ref(db, "confirmedOrders"), (snapshot) => {
+  
+  const container = document.getElementById("confirmedOrdersContainer");
+  container.innerHTML = "";
+  
+  const data = snapshot.val();
+  
+  if (!data) {
+    container.innerHTML = "<p>لا توجد طلبات مؤكدة</p>";
+    return;
+  }
+  
+  Object.entries(data).reverse().forEach(([key, order]) => {
+    
+    let itemsHtml = "";
+    
+    if (Array.isArray(order.items)) {
+      order.items.forEach(item => {
+        itemsHtml += `<div>• ${item.name} - ${item.serial} (عدد ${item.quantity})</div>`;
+      });
+    }
+    
+    container.innerHTML += `
+  <div class="order-card">
+
+    <div class="order-header">
+      <span>👤 ${order.customerName}</span>
+    </div>
+
+    <div>📞 ${order.phone}</div>
+    <div>🏠 ${order.address}</div>
+
+    <div class="order-items">
+      ${itemsHtml}
+    </div>
+
+    <div style="margin-top:10px;font-weight:bold;">
+      💰 ${order.totalPrice} دج
+    </div>
+
+    <div style="margin-top:10px;">
+      <button onclick="deleteConfirmedOrder('${key}')"
+      style="background:#e74c3c;color:white;border:none;padding:8px 12px;border-radius:6px;cursor:pointer;">
+      🗑️ حذف
+      </button>
+    </div>
+
+  </div>
+`;
+  });
+  
+});
+      
+
+    window.deleteProduct = async function(id) {
+  
+  if (!confirm("حذف هذا المنتج؟")) return;
+  
+  try {
+    
+    const product = allProducts[id];
+    if (!product) return;
+    
+    const imageUrl = product.imageUrl || product.img;
+    
+    if (imageUrl) {
+      
+      const parts = imageUrl.split("/storage/v1/object/public/");
+      const path = parts[1];
+      
+      if (path) {
+        
+        const pathParts = path.split("/");
+        pathParts.shift(); // حذف اسم البكت
+        
+        const filePath = pathParts.join("/");
+        
+        const { error } = await supabase.storage
+          .from(SUPABASE_BUCKET)
+          .remove([filePath]);
+        
+        if (error) {
+          console.log("خطأ حذف الصورة:", error);
+        }
+        
+      }
+      
+    }
+    
+    await remove(ref(db, "products/" + id));
+    
+    delete allProducts[id];
+    delete filteredProducts[id];
+    
+    applySearchFilter();
+    
+    showSuccess("✅ تم حذف المنتج والصورة");
+    
+  } catch (error) {
+    
+    console.error(error);
+    alert("حدث خطأ أثناء الحذف");
+    
+  }
+  
+};
+
+    window.editProduct = function(id) {
+      const p = allProducts[id];
+      if (!p) return;
+
+      document.getElementById("serial").value = p.serial || "";
+      document.getElementById("name").value = p.name || "";
+      document.getElementById("price").value = p.price || "";
+      document.getElementById("pack").value = p.pack || "";
+      document.getElementById("existingImgUrl").value = p.imageUrl || p.img || "";
+      document.getElementById("existingHidden").value = String(!!p.hidden);
+      document.getElementById("editIndex").value = id;
+      document.getElementById("formTitle").textContent = "تعديل المنتج";
+
+      const toggleBtn = document.getElementById("toggleVisibilityBtn");
+      toggleBtn.style.display = "inline-block";
+      toggleBtn.textContent = p.hidden ? "إظهار المنتج" : "إخفاء المنتج";
+
+      document.getElementById("addProductModal").style.display = "flex";
+    };
+
+    document.getElementById("addProductForm").onsubmit = async function(e) {
+      e.preventDefault();
+
+      const submitBtn = e.target.querySelector('button[type="submit"]');
+      const statusTxt = document.getElementById("uploadStatus");
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = "جاري الحفظ...";
+const serial = document.getElementById("serial").value.trim();
+      const name = document.getElementById("name").value.trim();
+      const price = Number(document.getElementById("price").value);
+      const pack = Number(document.getElementById("pack").value);
+      const fileInput = document.getElementById("imageFile");
+const cameraInput = document.getElementById("cameraInput");
+
+const id = document.getElementById("editIndex").value;
+const existingUrl = document.getElementById("existingImgUrl").value;
+const existingHidden = document.getElementById("existingHidden").value === "true";
+
+let finalImageUrl = existingUrl;
+
+const selectedFile = fileInput.files[0] || cameraInput.files[0];
+
+try {
+  if (!name) throw new Error("اسم المنتج مطلوب.");
+  if (isNaN(price) || price <= 0) throw new Error("السعر غير صحيح.");
+  if (isNaN(pack) || pack <= 0) throw new Error("الكمية غير صحيحة.");
+  
+  if (selectedFile) {
+    statusTxt.style.display = "block";
+    const file = selectedFile;
+    finalImageUrl = await uploadImageToSupabase(file);
+  }
+
+        const productData = {
+  serial,
+  name,
+  price,
+  pack,
+          imageUrl: finalImageUrl || "",
+          img: finalImageUrl || "",
+          hidden: id ? existingHidden : false
+        };
+
+        if (id) {
+          await update(ref(db, "products/" + id), productData);
+          showSuccess("✅ تم تعديل المنتج بنجاح");
+        } else {
+          await push(productsRef, productData);
+          showSuccess("✅ تم إضافة المنتج بنجاح");
+        }
+
+        document.getElementById("addProductModal").style.display = "none";
+        resetProductForm();
+
+      } catch (error) {
+        console.error("Full save error:", error);
+        alert("⚠️ حدث خطأ:\n" + error.message);
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "حفظ";
+        statusTxt.style.display = "none";
+      }
+    };
+
+    document.getElementById("searchInput").addEventListener("input", applySearchFilter);
+
+    window.switchTab = function(tabName, btn) {
+      document.querySelectorAll(".tab-btn").forEach((b) => b.classList.remove("active"));
+      if (btn) btn.classList.add("active");
+
+      document.getElementById("productsSection").style.display =
+        tabName === "products" ? "block" : "none";
+
+      document.getElementById("ordersSection").style.display =
+        tabName === "orders" ? "block" : "none";
+        document.getElementById("confirmedSection").style.display =
+  tabName === "confirmed" ? "block" : "none";
+
+      document.getElementById("addProductBtn").style.display =
+        tabName === "products" ? "block" : "none";
+    };
+
+    window.closeModal = function() {
+      document.getElementById("addProductModal").style.display = "none";
+    };
+
+    window.closeModalOnClickOutside = function(e) {
+      if (e.target.id === "addProductModal") {
+        closeModal();
+      }
+    };
+
+    window.checkPassword = function() {
+      if (document.getElementById("adminPassword").value === "admin") {
+        localStorage.setItem("auth", "true");
+        initAdmin();
+      } else {
+        alert("كلمة المرور خاطئة");
+      }
+    };
+
+    window.logout = function() {
+      if (confirm("تسجيل الخروج؟")) {
+        localStorage.removeItem("auth");
+        location.reload();
+      }
+    };
+
+    function initAdmin() {
+  document.getElementById("loginModal").style.display = "none";
+  document.getElementById("addProductBtn").style.display = "block";
+  document.getElementById("tabsContainer").style.display = "flex";
+}
+
+    window.saveCoverImage = function() {
+      const link = document.getElementById("coverInput").value.trim();
+
+      if (!link) {
+        alert("الرجاء إدخال رابط صورة الغلاف.");
+        return;
+      }
+
+      set(ref(db, "store/cover"), { url: link })
+        .then(() => showSuccess("✅ تم حفظ الغلاف"))
+        .catch((err) => alert("حدث خطأ أثناء حفظ الغلاف: " + err.message));
+    };
+
+    window.toggleCoverForm = function() {
+  const f = document.getElementById("coverForm");
+  f.style.display = f.style.display === "none" ? "block" : "none";
+};
+
+    window.toggleVisibility = function() {
+      const id = document.getElementById("editIndex").value;
+      const current = allProducts[id];
+
+      if (!id || !current) return;
+
+      update(ref(db, "products/" + id), { hidden: !current.hidden })
+        .then(() => {
+          showSuccess(current.hidden ? "✅ تم إظهار المنتج" : "✅ تم إخفاء المنتج");
+          document.getElementById("addProductModal").style.display = "none";
+        })
+        .catch((err) => {
+          alert("حدث خطأ أثناء تغيير حالة المنتج: " + err.message);
+        });
+    };
+    window.deleteOrder = async function(id) {
+  
+  if (!confirm("هل تريد حذف الطلب؟")) return;
+  
+  try {
+    
+    await remove(ref(db, "orders/" + id));
+    
+    showSuccess("✅ تم حذف الطلب");
+    
+  } catch (error) {
+    
+    console.error(error);
+    alert("حدث خطأ أثناء حذف الطلب");
+    
+  }
+  
+};
+window.confirmOrder = async function(id) {
+  
+  try {
+    
+    const snapshot = await get(ref(db, "orders/" + id));
+    
+    if (!snapshot.exists()) {
+      alert("الطلب غير موجود");
+      return;
+    }
+    
+    const orderData = snapshot.val();
+    
+    await set(ref(db, "confirmedOrders/" + id), orderData);
+    
+    await remove(ref(db, "orders/" + id));
+    
+    showSuccess("✅ تم تأكيد الطلب");
+    
+  } catch (err) {
+    
+    console.log(err);
+    alert("حدث خطأ أثناء تأكيد الطلب");
+    
+  }
+  
+};
+    window.onload = function() {
+      if (localStorage.getItem("auth") === "true") {
+        initAdmin();
+      }
+
+      document.getElementById("addProductBtn").addEventListener("click", () => {
+        resetProductForm();
+        document.getElementById("addProductModal").style.display = "flex";
+      });
+
+      onValue(ref(db, "store/cover"), (snapshot) => {
+        const data = snapshot.val();
+        if (data && data.url) {
+          document.getElementById("coverImage").src = data.url;
+        }
+      });
+    };
+    window.deleteConfirmedOrder = async function(id) {
+
+  if (!confirm("هل تريد حذف هذه الطلبية؟")) return;
+
+  try {
+
+    await remove(ref(db, "confirmedOrders/" + id));
+
+    showSuccess("✅ تم حذف الطلب");
+
+  } catch (error) {
+
+    console.log(error);
+    alert("حدث خطأ أثناء الحذف");
+
+  }
+
+};
+
+window.deleteAllConfirmed = async function() {
+
+  if (!confirm("هل تريد حذف جميع الطلبات المؤكدة؟")) return;
+
+  try {
+
+    await remove(ref(db, "confirmedOrders"));
+
+    showSuccess("✅ تم حذف جميع الطلبات");
+
+  } catch (error) {
+
+    console.log(error);
+    alert("حدث خطأ أثناء الحذف");
+
+  }
+
+};
+window.toggleMenu = function() {
+  
+  const menu = document.getElementById("adminMenu");
+  
+  menu.style.display = menu.style.display === "none" ? "block" : "none";
+  
+}
+
+window.openCoverUpload = function() {
+  
+  document.getElementById("coverFile").click();
+  
+}
+
+document.getElementById("coverFile").addEventListener("change", async function() {
+  
+  const file = this.files[0];
+  
+  if (!file) return;
+  
+  try {
+    
+    const imageUrl = await uploadImageToSupabase(file);
+    
+    await set(ref(db, "store/cover"), {
+      url: imageUrl
+    });
+    
+    showSuccess("✅ تم تغيير صورة الغلاف");
+    
+  } catch (err) {
+    
+    console.log(err);
+    alert("فشل رفع الصورة");
+    
+  }
+  
+});
+  </script>
+</body>
+</html>
