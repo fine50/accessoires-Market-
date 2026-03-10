@@ -180,6 +180,10 @@ style="display:none;position:absolute;top:55px;left:0;background:white;border-ra
 style="width:100%;padding:8px;border:none;background:#3498db;color:white;border-radius:6px;margin-bottom:6px;cursor:pointer;">
 🖼️ تغيير الغلاف
 </button>
+<button onclick="openSellersManager()" 
+style="width:100%;padding:8px;border:none;background:#27ae60;color:white;border-radius:6px;margin-bottom:6px;cursor:pointer;">
+👤 إدارة البائعين
+</button>
 
 <button onclick="logout()" 
 style="width:100%;padding:8px;border:none;background:#e74c3c;color:white;border-radius:6px;cursor:pointer;">
@@ -300,6 +304,12 @@ style="margin-bottom:15px;background:#e74c3c;color:white;border:none;padding:10p
     <div style="background:white;padding:30px;border-radius:16px;box-shadow:0 10px 25px rgba(0,0,0,0.3);width:90%;max-width:400px;text-align:center;">
       <h2 style="margin-bottom: 20px;">الإدارة</h2>
       <input
+type="text"
+id="adminUser"
+placeholder="اسم المستخدم"
+style="width: 100%; padding: 12px; margin-bottom: 10px; border:1px solid #ccc; border-radius:8px;"
+>
+      <input
         type="password"
         id="adminPassword"
         placeholder="أدخل كلمة السر"
@@ -343,7 +353,7 @@ placeholder="الرقم التسلسلي للمنتج"
 style="width:100%; padding:8px; border:1px solid #ccc; border-radius:6px;">
         <input type="text" id="name" placeholder="اسم المنتج" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 6px;">
         <input type="number" id="price" placeholder="السعر" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 6px;">
-        <input type="number" id="pack" placeholder="الكمية في العلبة" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 6px;">
+        <input type="number" id="pack" placeholder="الكمية " required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 6px;">
 
         <div style="width: 100%; text-align: right;">
           <label style="font-size: 13px;">صورة المنتج:</label>
@@ -657,9 +667,9 @@ itemsHtml += `
             🗑️ حذف الطلب
           </button>
 
-          <button onclick="confirmOrder('${key}')" style="background:#27ae60;color:white;border:none;padding:8px 12px;border-radius:6px;">
-            ✅ تأكيد الطلب
-          </button>
+          <button onclick="confirmAndPrint('${key}')" style="background:#27ae60;color:white;border:none;padding:8px 12px;border-radius:6px;">
+  ✅ تأكيد وطباعة الفاتورة
+</button>
         </div>
       </div>
     `;
@@ -706,12 +716,19 @@ onValue(ref(db, "confirmedOrders"), (snapshot) => {
       💰 ${order.totalPrice} دج
     </div>
 
-    <div style="margin-top:10px;">
-      <button onclick="deleteConfirmedOrder('${key}')"
-      style="background:#e74c3c;color:white;border:none;padding:8px 12px;border-radius:6px;cursor:pointer;">
-      🗑️ حذف
-      </button>
-    </div>
+    <div style="margin-top:10px; display:flex; gap:10px;">
+
+<button onclick="deleteConfirmedOrder('${key}')"
+style="background:#e74c3c;color:white;border:none;padding:8px 12px;border-radius:6px;cursor:pointer;">
+🗑️ حذف
+</button>
+
+<button onclick='printInvoice(${JSON.stringify(order)})'
+style="background:#3498db;color:white;border:none;padding:8px 12px;border-radius:6px;cursor:pointer;">
+📄 إظهار الفاتورة
+</button>
+
+</div>
 
   </div>
 `;
@@ -886,14 +903,37 @@ try {
       }
     };
 
-    window.checkPassword = function() {
-      if (document.getElementById("adminPassword").value === "admin") {
-        localStorage.setItem("auth", "true");
-        initAdmin();
-      } else {
-        alert("كلمة المرور خاطئة");
-      }
-    };
+    window.checkPassword = async function() {
+  
+  const user = document.getElementById("adminUser").value.trim();
+  const pass = document.getElementById("adminPassword").value.trim();
+  
+  if (!user || !pass) {
+    alert("اكتب اسم المستخدم وكلمة السر");
+    return;
+  }
+  
+  const snapshot = await get(ref(db, "sellers/" + user));
+  
+  if (!snapshot.exists()) {
+    alert("المستخدم غير موجود");
+    return;
+  }
+  
+  const data = snapshot.val();
+  
+  if (data.password !== pass) {
+    alert("كلمة السر خاطئة");
+    return;
+  }
+  
+  localStorage.setItem("auth", "true");
+  
+  localStorage.setItem("seller", user);
+  
+  initAdmin();
+  
+};
 
     window.logout = function() {
       if (confirm("تسجيل الخروج؟")) {
@@ -959,31 +999,27 @@ try {
   }
   
 };
-window.confirmOrder = async function(id) {
+window.confirmAndPrint = async function(id) {
   
-  try {
-    
-    const snapshot = await get(ref(db, "orders/" + id));
-    
-    if (!snapshot.exists()) {
-      alert("الطلب غير موجود");
-      return;
-    }
-    
-    const orderData = snapshot.val();
-    
-    await set(ref(db, "confirmedOrders/" + id), orderData);
-    
-    await remove(ref(db, "orders/" + id));
-    
-    showSuccess("✅ تم تأكيد الطلب");
-    
-  } catch (err) {
-    
-    console.log(err);
-    alert("حدث خطأ أثناء تأكيد الطلب");
-    
+  const snapshot = await get(ref(db, "orders/" + id));
+  
+  if (!snapshot.exists()) {
+    alert("الطلب غير موجود");
+    return;
   }
+  
+  const orderData = snapshot.val();
+  
+  orderData.seller = localStorage.getItem("seller") || "admin";
+  
+  await set(ref(db, "confirmedOrders/" + id), orderData);
+  
+  await remove(ref(db, "orders/" + id));
+  
+  showSuccess("✅ تم تأكيد الطلب");
+  
+  printInvoice(orderData);
+  
   
 };
     window.onload = function() {
@@ -1078,6 +1114,249 @@ document.getElementById("coverFile").addEventListener("change", async function()
   }
   
 });
+window.printInvoice = function(order) {
+  
+  let itemsRows = "";
+  
+  order.items.forEach((item, index) => {
+    
+    itemsRows += `
+<tr>
+<td>${index+1}</td>
+<td>${item.name}</td>
+<td>${item.serial || "لا يوجد"}</td>
+<td>${item.quantity}</td>
+</tr>
+`;
+    
+  });
+  
+  const modal = document.createElement("div");
+  
+  modal.style.position = "fixed";
+  modal.style.top = "0";
+  modal.style.left = "0";
+  modal.style.right = "0";
+  modal.style.bottom = "0";
+  modal.style.background = "rgba(0,0,0,0.6)";
+  modal.style.display = "flex";
+  modal.style.justifyContent = "center";
+  modal.style.alignItems = "center";
+  modal.style.zIndex = "5000";
+  
+  modal.innerHTML = `
+
+<div id="invoiceBox" style="
+background:white;
+padding:20px;
+border-radius:12px;
+width:90%;
+max-width:500px;
+max-height:90vh;
+overflow:auto;
+position:relative;
+">
+
+<div onclick="this.closest('#invoiceModal').remove()" 
+style="
+position:absolute;
+top:10px;
+left:10px;
+font-size:22px;
+cursor:pointer;
+color:#888;
+">
+❌
+</div>
+
+<h2 style="text-align:center;">Accessoires Market</h2>
+
+<div>👤 الزبون : ${order.customerName}</div>
+<div>📞 الهاتف : ${order.phone}</div>
+<div>🏠 العنوان : ${order.address}</div>
+
+<table style="
+width:100%;
+border-collapse:collapse;
+margin-top:15px;
+">
+
+<tr>
+<th style="border:1px solid #000;padding:6px;">#</th>
+<th style="border:1px solid #000;padding:6px;">المنتج</th>
+<th style="border:1px solid #000;padding:6px;">السيريال</th>
+<th style="border:1px solid #000;padding:6px;">الكمية</th>
+</tr>
+
+${itemsRows}
+
+</table>
+
+<h3 style="margin-top:15px;">
+المجموع : ${order.totalPrice} دج
+</h3>
+<div style="margin-top:10px;">
+  👤 البائع : ${order.seller || "غير معروف"}
+</div>
+<button onclick="window.print()" style="
+margin-top:15px;
+background:#3498db;
+color:white;
+border:none;
+padding:10px 15px;
+border-radius:6px;
+cursor:pointer;
+">
+🖨️ طباعة
+</button>
+
+</div>
+
+`;
+  
+  modal.id = "invoiceModal";
+  
+  modal.onclick = function(e) {
+    
+    if (e.target === modal) {
+      modal.remove();
+    }
+    
+  };
+  
+  document.body.appendChild(modal);
+  
+}
+window.openSellersManager = function() {
+  document.getElementById("sellersModal").style.display = "flex";
+  loadSellers();
+}
+
+window.closeSellersManager = function() {
+  document.getElementById("sellersModal").style.display = "none";
+}
+
+window.addSeller = async function() {
+  
+  const name = document.getElementById("newSellerName").value.trim();
+  const pass = document.getElementById("newSellerPass").value.trim();
+  
+  if (!name || !pass) {
+    alert("اكتب الاسم وكلمة السر");
+    return;
+  }
+  
+  await set(ref(db, "sellers/" + name), {
+  password: pass
+});
+
+showSuccess("✅ تم إضافة البائع");
+
+document.getElementById("newSellerName").value = "";
+document.getElementById("newSellerPass").value = "";
+
+loadSellers();
+  
+}
+
+async function loadSellers() {
+  
+  const snapshot = await get(ref(db, "sellers"));
+  
+  const list = document.getElementById("sellersList");
+  
+  list.innerHTML = "";
+  
+  if (!snapshot.exists()) return;
+  
+  const data = snapshot.val();
+  
+  Object.keys(data).forEach(name => {
+    
+    list.innerHTML += `
+<div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+<span>${name}</span>
+
+<button onclick="deleteSeller('${name}')" style="
+background:#e74c3c;
+color:white;
+border:none;
+padding:4px 8px;
+border-radius:6px;
+cursor:pointer;">
+حذف
+</button>
+
+</div>
+`;
+    
+  });
+  
+}
+
+window.deleteSeller = async function(name) {
+  
+  if (!confirm("حذف البائع ؟")) return;
+  
+  await remove(ref(db, "sellers/" + name));
+  
+  loadSellers();
+  
+}
   </script>
+  <div id="sellersModal" style="
+display:none;
+position:fixed;
+top:0;
+left:0;
+right:0;
+bottom:0;
+background:rgba(0,0,0,0.6);
+z-index:6000;
+justify-content:center;
+align-items:center;
+">
+
+<div style="
+background:white;
+padding:20px;
+border-radius:12px;
+width:90%;
+max-width:400px;
+">
+
+<h3>إدارة البائعين</h3>
+
+<input id="newSellerName" placeholder="اسم البائع" 
+style="width:100%;padding:8px;margin-bottom:8px;">
+
+<input id="newSellerPass" placeholder="كلمة السر" 
+style="width:100%;padding:8px;margin-bottom:8px;">
+
+<button onclick="addSeller()" style="
+background:#27ae60;
+color:white;
+border:none;
+padding:8px 12px;
+border-radius:6px;
+cursor:pointer;">
+➕ إضافة بائع
+</button>
+
+<div id="sellersList" style="margin-top:15px;"></div>
+
+<button onclick="closeSellersManager()" style="
+margin-top:10px;
+background:#e74c3c;
+color:white;
+border:none;
+padding:8px 12px;
+border-radius:6px;
+cursor:pointer;">
+إغلاق
+</button>
+
+</div>
+</div>
 </body>
 </html>
