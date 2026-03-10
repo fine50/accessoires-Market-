@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="ar">
 <head>
   <meta charset="UTF-8" />
@@ -162,6 +162,22 @@
     .hidden-product {
       opacity: 0.45;
     }
+    @media print {
+  
+  body {
+    margin: 0;
+    padding: 0;
+    background: white;
+  }
+  
+  #invoiceBox {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+  }
+  
+}
   </style>
 </head>
 <body>
@@ -1171,9 +1187,9 @@ color:#888;
 
 <h2 style="text-align:center;">Accessoires Market</h2>
 
-<div>👤 الزبون : ${order.customerName}</div>
-<div>📞 الهاتف : ${order.phone}</div>
-<div>🏠 العنوان : ${order.address}</div>
+<div> الزبون : ${order.customerName}</div>
+<div> الهاتف : ${order.phone}</div>
+<div> العنوان : ${order.address}</div>
 
 <table style="
 width:100%;
@@ -1303,6 +1319,7 @@ window.deleteSeller = async function(name) {
   loadSellers();
   
 }
+
   </script>
   <div id="sellersModal" style="
 display:none;
