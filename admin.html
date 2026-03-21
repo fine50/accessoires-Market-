@@ -652,18 +652,28 @@ const publicUrl = data.publicUrl;
     let itemsHtml = "";
     
     if (Array.isArray(order.items)) {
-      order.items.forEach((item) => {
-        const serialText = item.serial ? item.serial : "لا يوجد";
-
-itemsHtml += `
-<div style="margin-bottom:6px;">
-  <div>📦 المنتج: ${item.name}</div>
-  <div>🔢 السيريال: ${serialText}</div>
-  <div>📦 الكمية: ${item.quantity}</div>
-</div>
-`;
-      });
-    }
+  order.items.forEach((item) => {
+    const serialText = item.serial ? item.serial : "---";
+    // التعديل هنا: سطر واحد (كمية -> اسم -> سيريال) بستايل عصري
+    itemsHtml += `
+        <div style="display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid #eee; font-family: 'Cairo', sans-serif;">
+          <span style="
+  color: #27ae60;
+  font-weight: bold;
+  font-size: 14px;
+  min-width: 20px;
+  text-align: center;
+">
+  ${item.quantity}
+</span>
+          <span style="flex: 1; font-weight: 600; color: #333;">${item.name}</span>
+          <span style="font-size: 12px; color: #7f8c8d; background: #f8f9fa; padding: 2px 8px; border-radius: 4px; border: 1px solid #eee;">
+            # ${serialText}
+          </span>
+        </div>
+        `;
+  });
+}
     
     ordersContainer.innerHTML += `
       <div class="order-card">
@@ -679,7 +689,7 @@ itemsHtml += `
         </div>
 
         <div style="margin-top:10px;font-weight:bold;">
-          💰 ${order.totalPrice} دج
+           ${order.totalPrice} دج
         </div>
 
         <div class="order-footer">
@@ -709,16 +719,44 @@ onValue(ref(db, "confirmedOrders"), (snapshot) => {
   }
   
   Object.entries(data).reverse().forEach(([key, order]) => {
-    
-    let itemsHtml = "";
-    
-    if (Array.isArray(order.items)) {
-      order.items.forEach(item => {
-        itemsHtml += `<div>• ${item.name} - ${item.serial} (عدد ${item.quantity})</div>`;
-      });
-    }
-    
-    container.innerHTML += `
+ 
+ let itemsHtml = "";
+ 
+ if (Array.isArray(order.items)) {
+   order.items.forEach(item => {
+     itemsHtml += `
+<div style="display: flex; align-items: center; gap: 10px; padding: 4px 0; border-bottom: 1px solid #eee; font-family: 'Cairo', sans-serif; font-size:13px;">
+  
+  <span style="
+    color: #27ae60;
+    font-weight: bold;
+    min-width: 20px;
+    text-align: center;
+  ">
+    ${item.quantity}
+  </span>
+
+  <span style="flex: 1; font-weight: 600; color: #333;">
+    ${item.name}
+  </span>
+
+  <span style="
+    font-size: 11px;
+    color: #7f8c8d;
+    background: #f8f9fa;
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid #eee;
+  ">
+    # ${item.serial || "---"}
+  </span>
+
+</div>
+`;
+   });
+ }
+ 
+ container.innerHTML += `
   <div class="order-card">
 
     <div class="order-header">
@@ -733,7 +771,7 @@ onValue(ref(db, "confirmedOrders"), (snapshot) => {
     </div>
 
     <div style="margin-top:10px;font-weight:bold;">
-      💰 ${order.totalPrice} دج
+       ${order.totalPrice} دج
     </div>
 
     <div style="margin-top:10px; display:flex; gap:10px;">
@@ -752,9 +790,9 @@ style="background:#3498db;color:white;border:none;padding:8px 12px;border-radius
 
   </div>
 `;
-  });
-  
-});
+ });
+ 
+ });
       
 
     window.deleteProduct = async function(id) {
@@ -1142,10 +1180,10 @@ window.printInvoice = function(order) {
     
     itemsRows += `
 <tr>
-<td>${index+1}</td>
-<td>${item.name}</td>
-<td>${item.serial || "لا يوجد"}</td>
-<td>${item.quantity}</td>
+<td style="border:1px solid #000;padding:6px;">${index+1}</td>
+<td style="border:1px solid #000;padding:6px;">${item.name}</td>
+<td style="border:1px solid #000;padding:6px;">${item.serial || "لا يوجد"}</td>
+<td style="border:1px solid #000;padding:6px;">${item.quantity}</td>
 </tr>
 `;
     
@@ -1189,6 +1227,11 @@ color:#888;
 ❌
 </div>
 
+<div style="text-align:center; margin-bottom:10px;">
+  <img src="https://i.postimg.cc/kXTKCRgv/IMG-20260321-225840.jpg"
+       style="width:70px; height:auto; display:block; margin:auto;">
+</div>
+
 <h2 style="text-align:center;">Accessoires Market</h2>
 
 <div>Client : ${order.customerName}</div>
@@ -1204,7 +1247,7 @@ margin-top:15px;
 <tr>
 <th style="border:1px solid #000;padding:6px;">#</th>
 <th style="border:1px solid #000;padding:6px;">Produit</th>
-<th style="border:1px solid #000;padding:6px;">Numéro</th>
+<th style="border:1px solid #000;padding:6px;">référence</th>
 <th style="border:1px solid #000;padding:6px;">Quantité</th>
 </tr>
 
