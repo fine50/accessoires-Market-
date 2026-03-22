@@ -10,8 +10,8 @@
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, sans-serif;
-      direction: rtl;
-      text-align: center;
+      direction: ltr;
+      text-align: left;
       background-color: #f4f4f4;
       margin: 0;
       padding-bottom: 100px;
@@ -118,8 +118,8 @@
       box-shadow: 0 4px 10px rgba(0,0,0,0.1);
       width: 90%;
       max-width: 600px;
-      text-align: right;
-      border-right: 5px solid #007cf0;
+      text-align: left;
+  border-left: 5px solid #007cf0; #007cf0;
     }
 
     .order-header {
@@ -200,7 +200,7 @@
 </head>
 <body>
 
-  <div style="position:fixed;top:15px;left:15px;z-index:2000;">
+  <div style="position:fixed;top:15px; right:15px;z-index:2000;">
 
 <button onclick="toggleMenu()" 
 style="background:#3498db;color:white;border:none;border-radius:50%;width:45px;height:45px;font-size:20px;cursor:pointer;">
@@ -208,7 +208,7 @@ style="background:#3498db;color:white;border:none;border-radius:50%;width:45px;h
 </button>
 
 <div id="adminMenu" 
-style="display:none;position:absolute;top:55px;left:0;background:white;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,0.2);padding:10px;min-width:150px;">
+style="display:none;position:absolute;top:55px; right:0;background:white;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,0.2);padding:10px;min-width:150px;">
 
 <button onclick="openCoverUpload()" 
 style="width:100%;padding:8px;border:none;background:#3498db;color:white;border-radius:6px;margin-bottom:6px;cursor:pointer;">
@@ -707,14 +707,14 @@ const publicUrl = data.publicUrl;
         </div>
 
         <div>📞 ${order.phone}</div>
-        <div>🏠 ${order.address}</div>
+        <div>📍 ${order.address}</div>
 
         <div class="order-items">
           ${itemsHtml}
         </div>
 
         <div style="margin-top:10px;font-weight:bold;">
-           ${order.totalPrice} دج
+           ${order.totalPrice} DA
         </div>
 
         <div class="order-footer">
@@ -789,7 +789,7 @@ onValue(ref(db, "confirmedOrders"), (snapshot) => {
     </div>
 
     <div>📞 ${order.phone}</div>
-    <div>🏠 ${order.address}</div>
+    <div>📍 ${order.address}</div>
 
     <div class="order-items">
       ${itemsHtml}
@@ -884,7 +884,7 @@ style="background:#3498db;color:white;border:none;padding:8px 12px;border-radius
       document.getElementById("existingImgUrl").value = p.imageUrl || p.img || "";
       document.getElementById("existingHidden").value = String(!!p.hidden);
       document.getElementById("editIndex").value = id;
-      document.getElementById("formTitle").textContent = "تعديل المنتج";
+      document.getElementById("formTitle").textContent = "modifier ";
 
       const toggleBtn = document.getElementById("toggleVisibilityBtn");
       toggleBtn.style.display = "inline-block";
@@ -1298,20 +1298,39 @@ window.printInvoice = function(order) {
 <table style="width:100%;border-collapse:collapse;margin-top:25px;font-size:13px;">
 
 <tr style="background:#f0f0f0;">
-  <th style="padding:8px;border:1px solid #ccc;">Article</th>
-  <th style="padding:8px;border:1px solid #ccc;">Qté</th>
-  <th style="padding:8px;border:1px solid #ccc;">Prix</th>
-  <th style="padding:8px;border:1px solid #ccc;">Total</th>
+  <th style="padding:8px;border:1px solid #ccc;width:50%;">Nom du produit</th>
+  <th style="padding:8px;border:1px solid #ccc;width:16%;">Référence</th>
+  <th style="padding:8px;border:1px solid #ccc;width:17%;">Quantité</th>
+  <th style="padding:8px;border:1px solid #ccc;width:17%;">Total</th>
 </tr>
 
 ${order.items.map(item => `
 <tr>
-  <td style="padding:8px;border:1px solid #ccc;">${item.name}</td>
-  <td style="padding:8px;border:1px solid #ccc;text-align:center;">${item.quantity}</td>
-  <td style="padding:8px;border:1px solid #ccc;text-align:center;">${item.price} DA</td>
+  
+  <!-- النصف الأول -->
+  <td style="
+    padding:8px;
+    border:1px solid #ccc;
+    width:50%;
+    font-weight:600;
+    word-break: break-word;
+  ">
+    ${item.name}
+  </td>
+  
+  <!-- النصف الثاني (3 أعمدة) -->
+  <td style="padding:8px;border:1px solid #ccc;text-align:center;">
+    ${item.serial || "---"}
+  </td>
+  
+  <td style="padding:8px;border:1px solid #ccc;text-align:center;">
+    ${item.quantity}
+  </td>
+  
   <td style="padding:8px;border:1px solid #ccc;text-align:center;">
     ${(item.price * item.quantity)} DA
   </td>
+  
 </tr>
 `).join("")}
 
