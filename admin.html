@@ -163,27 +163,38 @@
       opacity: 0.45;
     }
     @media print {
-
+  
   @page {
     size: A4;
-    margin: 10mm;
+    margin: 0;
   }
-
+  
   body {
     margin: 0;
     padding: 0;
     background: white;
-    font-size: 10px; /* تصغير عام */
+    font-size: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
   }
-
+  
+  /* إخفاء زر الإغلاق وزر الطباعة */
+  .no-print {
+    display: none !important;
+  }
+  
   #invoiceBox {
     width: 100%;
     max-width: 100%;
+    margin: 0 auto;
     box-shadow: none;
   }
-tr {
-  height: 20px;
-}
+  
+  tr {
+    height: 20px;
+  }
+  
 }
   </style>
 </head>
@@ -1084,9 +1095,14 @@ window.confirmAndPrint = async function(id) {
   
 };
     window.onload = function() {
-      if (localStorage.getItem("auth") === "true") {
-        initAdmin();
-      }
+    const auth = localStorage.getItem("auth");
+    const seller = localStorage.getItem("seller");
+    
+    if (auth === "true" && seller) {
+      initAdmin();
+    } else {
+  // لا تمسح البيانات
+}
 
       document.getElementById("addProductBtn").addEventListener("click", () => {
         resetProductForm();
@@ -1184,7 +1200,7 @@ window.printInvoice = function(order) {
     itemsRows += `
 <tr>
 
-<td style="border:1px solid #000;padding:3px;font-size:10px;text-align:center;width:40px;">
+<td style="border:1px solid #000;padding:3px;font-size:11px;text-align:center;width:60px;">
   ${item.quantity}
 </td>
 
@@ -1193,7 +1209,7 @@ window.printInvoice = function(order) {
   padding:3px;
   font-size:9px;
   font-weight:400;
-  width:55%;
+  width:100%;
   white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
@@ -1201,11 +1217,11 @@ window.printInvoice = function(order) {
   ${item.name}
 </td>
 
-<td style="border:1px solid #000;padding:3px;font-size:10px;text-align:center;width:70px;">
+<td style="border:1px solid #000;padding:3px;font-size:11px;text-align:center;width:90px;">
   ${(item.price * item.quantity).toLocaleString()} DA
 </td>
 
-<td style="border:1px solid #000;padding:3px;font-size:9px;text-align:center;width:70px;">
+<td style="border:1px solid #000;padding:3px;font-size:10px;text-align:center;width:90px;">
   ${item.serial || "---"}
 </td>
 
@@ -1223,15 +1239,15 @@ window.printInvoice = function(order) {
   modal.style.bottom = "0";
   modal.style.background = "rgba(0,0,0,0.6)";
   modal.style.display = "flex";
-  modal.style.justifyContent = "center";
-  modal.style.alignItems = "center";
+  modal.style.justifyContent = "flex-start";
+  modal.style.alignItems = "flex-start";
   modal.style.zIndex = "5000";
   
   modal.innerHTML = `
 
 <div id="invoiceBox" style="
 background:white;
-padding:20px;
+padding:5px 20px 20px 20px;
 border-radius:12px;
 width:90%;
 max-width:500px;
@@ -1240,15 +1256,8 @@ overflow:auto;
 position:relative;
 ">
 
-<div onclick="this.closest('#invoiceModal').remove()" 
-style="
-position:absolute;
-top:10px;
-left:10px;
-font-size:22px;
-cursor:pointer;
-color:#888;
-">
+<div class="no-print" onclick="closeInvoice()" 
+style="position:absolute;top:10px;left:10px;font-size:22px;cursor:pointer;color:#888;">
 ❌
 </div>
 
@@ -1276,11 +1285,11 @@ width:100%;
 border-collapse:collapse;
 margin-top:10px;
 table-layout:fixed;
-font-size:10px;
+font-size:12px;
 ">
 
 <tr>
-<th style="border:1px solid #000;padding:3px;font-size:11px;width:40px;text-align:center;">Qte</th>
+<th style="border:1px solid #000;padding:3px;font-size:11px;width:70px;text-align:center;">Qte</th>
 <th style="border:1px solid #000;padding:3px;font-size:11px;width:55%;">Produit</th>
 <th style="border:1px solid #000;padding:3px;font-size:11px;width:70px;text-align:center;">Prix</th>
 <th style="border:1px solid #000;padding:3px;font-size:11px;width:70px;text-align:center;">N°</th>
@@ -1297,7 +1306,7 @@ ${itemsRows}
 <div style="margin-top:10px;">
    Vendeur : ${order.seller || "Inconnu"}
 </div>
-<button onclick="window.print()" style="
+<button class="no-print" onclick="printCurrentInvoice()" style="
 margin-top:15px;
 background:#3498db;
 color:white;
@@ -1325,6 +1334,13 @@ cursor:pointer;
   
   document.body.appendChild(modal);
   
+}
+window.printCurrentInvoice = function() {
+  window.print();
+}
+window.closeInvoice = function() {
+  const modal = document.getElementById("invoiceModal");
+  if (modal) modal.remove();
 }
 window.openSellersManager = function() {
   document.getElementById("sellersModal").style.display = "flex";
