@@ -1255,82 +1255,86 @@ window.printInvoice = function(order) {
   modal.style.zIndex = "5000";
   
   modal.innerHTML = `
+<div id="invoiceBox" style="background:white;padding:30px;width:100%;max-width:900px;margin:auto;font-family:Arial;">
 
-<div id="invoiceBox" style="
-background:white;
-padding:5px 20px 20px 20px;
-border-radius:12px;
-width:90%;
-max-width:500px;
-max-height:90vh;
-overflow:auto;
-position:relative;
-">
-
-<div class="no-print" onclick="closeInvoice()" 
-style="position:absolute;top:10px;left:10px;font-size:22px;cursor:pointer;color:#888;">
-❌
-</div>
-
-<div style="position:relative;margin-bottom:5px;height:45px;">
-
-  <div style="text-align:center;font-size:16px;font-weight:bold;line-height:45px;">
-    Accessoires Market
+<!-- Header -->
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+  
+  <div style="display:flex;align-items:center;gap:10px;">
+    <img src="https://i.postimg.cc/kXTKCRgv/IMG-20260321-225840.jpg" style="width:60px;">
+    <div>
+      <div style="font-weight:bold;">Accessoires Market</div>
+      <div style="font-size:12px;color:#555;">Alger</div>
+    </div>
   </div>
 
-  <img src="https://i.postimg.cc/kXTKCRgv/IMG-20260321-225840.jpg"
-       style="position:absolute;right:0;top:5px;width:40px;height:auto;">
+  <div style="text-align:right;font-size:12px;">
+    <div><b>Facture</b></div>
+    <div>Date: ${new Date().toLocaleDateString()}</div>
+  </div>
 
 </div>
 
-<div style="
-font-size:12px;
-color:#444;
-margin-bottom:5px;
-">
-  ${order.customerName} | ${order.phone} | ${order.address}
+<hr>
+
+<!-- Client -->
+<div style="display:flex;justify-content:space-between;margin-top:20px;font-size:13px;">
+
+  <div>
+    <b>Client:</b><br>
+    ${order.customerName}<br>
+    ${order.phone}<br>
+    ${order.address}
+  </div>
+
+  <div>
+    <b>Vendeur:</b><br>
+    ${order.seller || "Admin"}
+  </div>
+
 </div>
 
-<table style="
-width:100%;
-border-collapse:collapse;
-margin-top:10px;
-table-layout:fixed;
-font-size:12px;
-">
+<!-- Table -->
+<table style="width:100%;border-collapse:collapse;margin-top:25px;font-size:13px;">
 
-<tr>
-<th style="border:1px solid #000;padding:3px;font-size:11px;width:70px;text-align:center;">Qte</th>
-<th style="border:1px solid #000;padding:3px;font-size:11px;width:55%;">Produit</th>
-<th style="border:1px solid #000;padding:3px;font-size:11px;width:70px;text-align:center;">Prix</th>
-<th style="border:1px solid #000;padding:3px;font-size:11px;width:70px;text-align:center;">N°</th>
+<tr style="background:#f0f0f0;">
+  <th style="padding:8px;border:1px solid #ccc;">Article</th>
+  <th style="padding:8px;border:1px solid #ccc;">Qté</th>
+  <th style="padding:8px;border:1px solid #ccc;">Prix</th>
+  <th style="padding:8px;border:1px solid #ccc;">Total</th>
 </tr>
 
-${itemsRows}
+${order.items.map(item => `
+<tr>
+  <td style="padding:8px;border:1px solid #ccc;">${item.name}</td>
+  <td style="padding:8px;border:1px solid #ccc;text-align:center;">${item.quantity}</td>
+  <td style="padding:8px;border:1px solid #ccc;text-align:center;">${item.price} DA</td>
+  <td style="padding:8px;border:1px solid #ccc;text-align:center;">
+    ${(item.price * item.quantity)} DA
+  </td>
+</tr>
+`).join("")}
 
 </table>
 
-<h3 style="margin-top:15px;">
-  Total : ${order.totalPrice} DA
-</h3>
-
-<div style="margin-top:10px;">
-   Vendeur : ${order.seller || "Inconnu"}
+<!-- Total -->
+<div style="margin-top:30px;text-align:right;font-size:16px;">
+  <b>Total: ${order.totalPrice} DA</b>
 </div>
+
+<!-- Print Button -->
 <button class="no-print" onclick="printCurrentInvoice()" style="
-margin-top:15px;
+margin-top:20px;
 background:#3498db;
 color:white;
 border:none;
 padding:10px 15px;
 border-radius:6px;
-cursor:pointer;
-">
+cursor:pointer;">
 🖨️ طباعة
 </button>
 
 </div>
-
 `;
   
   modal.id = "invoiceModal";
