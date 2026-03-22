@@ -2,7 +2,7 @@
 <html lang="ar">
 <head>
   <meta charset="UTF-8" />
-  <title>market Owner - لوحة التحكم</title>
+  <title>Administration du magasin</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700&display=swap" rel="stylesheet">
@@ -212,16 +212,16 @@ style="display:none;position:absolute;top:55px;left:0;background:white;border-ra
 
 <button onclick="openCoverUpload()" 
 style="width:100%;padding:8px;border:none;background:#3498db;color:white;border-radius:6px;margin-bottom:6px;cursor:pointer;">
-🖼️ تغيير الغلاف
+  Changer la couverture
 </button>
 <button onclick="openSellersManager()" 
 style="width:100%;padding:8px;border:none;background:#27ae60;color:white;border-radius:6px;margin-bottom:6px;cursor:pointer;">
-👤 إدارة البائعين
+👤 Administration
 </button>
 
 <button onclick="logout()" 
 style="width:100%;padding:8px;border:none;background:#e74c3c;color:white;border-radius:6px;cursor:pointer;">
-🚪 خروج
+🚪 Sortie
 </button>
 
 </div>
@@ -235,14 +235,13 @@ style="width:100%;padding:8px;border:none;background:#e74c3c;color:white;border-
     +
   </button>
 
-  <h1 class="admin-header">لوحة التحكم</h1>
+  <h1 class="admin-header">contrôle</h1>
 
   <div class="tabs-container" id="tabsContainer" style="display:none;">
-    <button class="tab-btn active" onclick="switchTab('products', this)">📦 المنتجات</button>
+    <button class="tab-btn active" onclick="switchTab('products', this)">📦Produits </button>
     <button class="tab-btn" onclick="switchTab('orders', this)" style="position:relative;">
 
-  🔔 الطلبات الواردة
-  
+  🔔 Demandes entrantes
   <span id="ordersBadge" style="
 position:absolute;
 top:-6px;
@@ -260,7 +259,8 @@ display:none;
 </button>
 
 <button class="tab-btn" onclick="switchTab('confirmed', this)">
-  📦 الطلبات المؤكدة
+  📦  Demandes confirmées
+  
 </button>
 
 </div>
@@ -270,7 +270,7 @@ display:none;
       <input
         type="text"
         id="searchInput"
-        placeholder="ابحث عن منتج..."
+        placeholder="Rechercher un produit..."
         style="padding: 10px; width: 80%; max-width: 300px; border: 1px solid #ccc; border-radius: 8px; font-family: 'Cairo', sans-serif;"
       />
     </div>
@@ -280,7 +280,7 @@ display:none;
     id="coverImage"
     src=""
     style="width:100%;max-height:200px;object-fit:cover;border-radius:12px;"
-    alt="صورة الغلاف"
+    alt="photo de couverture"
   />
   <input
     type="file"
@@ -298,10 +298,10 @@ display:none;
 
 <div id="ordersSection" style="display:none;">
   
-  <h3 style="color:#555;">الطلبات الواردة</h3>
+  <h3 style="color:#555;">Commandes entrantes</h3>
   
   <div id="ordersContainer" style="padding-bottom:50px;">
-    <p>جاري تحميل الطلبات...</p>
+    <p>  Chargement ...</p>
   </div>
   
 </div>
@@ -311,15 +311,15 @@ display:none;
 
 <div id="confirmedSection" style="display:none;">
   
-  <h3 style="color:#555;">الطلبات المؤكدة</h3>
+  <h3 style="color:#555;"> Demandes confirmées</h3>
 
 <button onclick="deleteAllConfirmed()" 
 style="margin-bottom:15px;background:#e74c3c;color:white;border:none;padding:10px 15px;border-radius:8px;cursor:pointer;">
-🗑️ حذف جميع الطلبات المؤكدة
+🗑️ Supprimer les commandes confirmées
 </button>
   
   <div id="confirmedOrdersContainer" style="padding-bottom:50px;">
-    <p>جاري تحميل الطلبات...</p>
+    <p>  Chargement...</p>
   </div>
   
 </div>
@@ -328,7 +328,7 @@ style="margin-bottom:15px;background:#e74c3c;color:white;border:none;padding:10p
     id="successMessage"
     style="display:none;position:fixed;top:30px;left:50%;transform:translateX(-50%);background:#4CAF50;color:white;padding:12px 24px;border-radius:12px;box-shadow:0 8px 20px rgba(0,0,0,0.3);z-index:2000;font-size:17px;"
   >
-    ✅ تمت العملية بنجاح
+    ✅ Succès de l'opération  
   </div>
 
   <div
@@ -347,24 +347,24 @@ style="margin-bottom:15px;background:#e74c3c;color:white;border:none;padding:10p
   "
 >
     <div style="background:white;padding:30px;border-radius:16px;box-shadow:0 10px 25px rgba(0,0,0,0.3);width:90%;max-width:400px;text-align:center;">
-      <h2 style="margin-bottom: 20px;">الإدارة</h2>
+      <h2 style="margin-bottom: 20px;">Administration</h2>
       <input
 type="text"
 id="adminUser"
-placeholder="اسم المستخدم"
+placeholder="nom d'utilisateur"
 style="width: 100%; padding: 12px; margin-bottom: 10px; border:1px solid #ccc; border-radius:8px;"
 >
       <input
         type="password"
         id="adminPassword"
-        placeholder="أدخل كلمة السر"
+        placeholder="Saisissez votre mot de passe"
         style="width: 100%; padding: 12px; margin-bottom: 16px; border:1px solid #ccc; border-radius:8px;"
       >
       <button
         onclick="checkPassword()"
         style="width: 100%; padding: 12px; background-color: #007bff; color: white; border: none; border-radius: 8px; cursor: pointer;"
       >
-        دخول
+        Connexion
       </button>
     </div>
   </div>
@@ -385,7 +385,7 @@ style="width: 100%; padding: 12px; margin-bottom: 10px; border:1px solid #ccc; b
         ×
       </span>
 
-      <h2 id="formTitle" style="margin-bottom: 18px; color: #3498db; text-align: center;">إضافة منتج جديد</h2>
+      <h2 id="formTitle" style="margin-bottom: 18px; color: #3498db; text-align: center;">Ajouter un nouveau produit</h2>
 
       <form id="addProductForm" style="display: flex; flex-direction: column; gap: 12px; align-items: center;">
         <input type="hidden" id="editIndex">
@@ -394,14 +394,14 @@ style="width: 100%; padding: 12px; margin-bottom: 10px; border:1px solid #ccc; b
 <input
 type="text"
 id="serial"
-placeholder="الرقم التسلسلي للمنتج"
+placeholder="Référence"
 style="width:100%; padding:8px; border:1px solid #ccc; border-radius:6px;">
-        <input type="text" id="name" placeholder="اسم المنتج" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 6px;">
-        <input type="number" id="price" placeholder="السعر" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 6px;">
-        <input type="number" id="pack" placeholder="الكمية " required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 6px;">
+        <input type="text" id="name" placeholder="Nom du produit" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 6px;">
+        <input type="number" id="price" placeholder="prix" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 6px;">
+        <input type="number" id="pack" placeholder="Quantité" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 6px;">
 
         <div style="width: 100%; text-align: right;">
-          <label style="font-size: 13px;">صورة المنتج:</label>
+          <label style="font-size: 13px;">image</label>
           <div style="display:flex; gap:10px; margin-top:5px;">
 
 <input
@@ -413,7 +413,7 @@ style="flex:1; padding:6px; border:1px solid #ccc; border-radius:6px;">
 <label
 for="cameraInput"
 style="flex:1; background:#3498db; color:white; border-radius:6px; padding:6px; text-align:center; cursor:pointer;">
-📷 تصوير
+📷 Photo
 </label>
 
 <input
@@ -424,18 +424,18 @@ capture="environment"
 style="display:none;">
 
 </div>
-          <p id="uploadStatus" style="font-size:12px; color:orange; display:none;">جاري رفع البيانات...</p>
+          <p id="uploadStatus" style="font-size:12px; color:orange; display:none;">  Les données sont en cours de chargement....</p>
         </div>
 
         <div style="margin-top: 10px; display: flex; gap: 10px;">
-          <button type="submit" class="action-btn">حفظ</button>
+          <button type="submit" class="action-btn">sauvegarder</button>
           <button
             type="button"
             id="toggleVisibilityBtn"
             onclick="toggleVisibility()"
             style="display: none; background-color: orange; color: white; padding: 8px 22px; border:none; border-radius:6px; cursor:pointer;"
           >
-            إخفاء المنتج
+             Masquer le produit
           </button>
         </div>
       </form>
@@ -488,7 +488,7 @@ style="display:none;">
       return div.innerHTML;
     }
 
-    function showSuccess(message = "✅ تمت العملية بنجاح") {
+    function showSuccess(message = "✅ Succès de l'opération") {
       const msg = document.getElementById("successMessage");
       msg.textContent = message;
       msg.style.display = "block";
@@ -502,7 +502,7 @@ style="display:none;">
       document.getElementById("editIndex").value = "";
       document.getElementById("existingImgUrl").value = "";
       document.getElementById("existingHidden").value = "false";
-      document.getElementById("formTitle").textContent = "إضافة منتج جديد";
+      document.getElementById("formTitle").textContent = "  Ajouter un produit";
       document.getElementById("toggleVisibilityBtn").style.display = "none";
       document.getElementById("uploadStatus").style.display = "none";
     }
@@ -549,7 +549,7 @@ style="display:none;">
       const pageItems = productsArray.slice(start, end);
 
       if (pageItems.length === 0) {
-        container.innerHTML = "<p>لا توجد منتجات.</p>";
+        container.innerHTML = "<p>Aucun produit  .</p>";
         renderPagination(0, 1);
         return;
       }
@@ -570,10 +570,10 @@ style="display:none;">
             onerror="this.src='https://via.placeholder.com/150'"
           >
           <h3>${escapeHtml(product.name || "")}</h3>
-          <div class="price">${Number(product.price || 0)} دج</div>
-          <div>علبة: ${Number(product.pack || 0)}</div>
-          <button class="edit-btn" onclick="editProduct('${id}')">تعديل</button>
-          <button class="delete-btn" onclick="deleteProduct('${id}')">حذف</button>
+          <div class="price">${Number(product.price || 0)} DA</div>
+          <div>quantité: ${Number(product.pack || 0)}</div>
+          <button class="edit-btn" onclick="editProduct('${id}')"> modifier</button>
+          <button class="delete-btn" onclick="deleteProduct('${id}')"> supprimer</button>
         `;
 
         container.appendChild(div);
@@ -620,14 +620,14 @@ style="display:none;">
         console.error("Supabase upload error:", uploadError);
 
         if (uploadError.message?.toLowerCase().includes("bucket not found")) {
-          throw new Error(`Bucket باسم "${SUPABASE_BUCKET}" غير موجود داخل Supabase Storage.`);
+          throw new Error(`Bucket Par nom "${SUPABASE_BUCKET}" indisponible   Supabase Storage.`);
         }
 
         if (uploadError.message?.toLowerCase().includes("row-level security")) {
-          throw new Error("سياسات Supabase تمنع رفع الصورة. تحقق من Policies الخاصة بالرفع.");
+          throw new Error("Erreur de sécurité Supabase (RLS). Accès refusé.");
         }
 
-        throw new Error("فشل رفع الصورة: " + uploadError.message);
+        throw new Error("Échec du chargement de l'image  : " + uploadError.message);
       }
 
       const { data } = supabase.storage
@@ -637,7 +637,7 @@ style="display:none;">
 const publicUrl = data.publicUrl;
 
       if (!publicUrl) {
-        throw new Error("تم رفع الصورة لكن تعذر إنشاء الرابط العام.");
+        throw new Error("L'image a été téléchargée, mais le lien public n'a pas pu être créé..");
       }
 
       console.log("Public URL:", publicUrl);
@@ -668,7 +668,7 @@ const publicUrl = data.publicUrl;
   ordersContainer.innerHTML = "";
   
   if (!ordersData) {
-    ordersContainer.innerHTML = '<p style="text-align:center; margin-top:20px;">لا توجد طلبات جديدة.</p>';
+    ordersContainer.innerHTML = '<p style="text-align:center; margin-top:20px;">Aucune nouvelle demande.</p>';
     return;
   }
   
@@ -719,11 +719,11 @@ const publicUrl = data.publicUrl;
 
         <div class="order-footer">
           <button onclick="deleteOrder('${key}')" style="background:#e74c3c;color:white;border:none;padding:8px 12px;border-radius:6px;">
-            🗑️ حذف الطلب
+            🗑️  Supprimer la commande
           </button>
 
           <button onclick="confirmAndPrint('${key}')" style="background:#27ae60;color:white;border:none;padding:8px 12px;border-radius:6px;">
-  ✅ تأكيد وطباعة الفاتورة
+  ✅  Confirmation et impression 
 </button>
         </div>
       </div>
@@ -739,7 +739,7 @@ onValue(ref(db, "confirmedOrders"), (snapshot) => {
   const data = snapshot.val();
   
   if (!data) {
-    container.innerHTML = "<p>لا توجد طلبات مؤكدة</p>";
+    container.innerHTML = "<p>Aucune commande confirmée</p>";
     return;
   }
   
@@ -796,19 +796,19 @@ onValue(ref(db, "confirmedOrders"), (snapshot) => {
     </div>
 
     <div style="margin-top:10px;font-weight:bold;">
-       ${order.totalPrice} دج
+       ${order.totalPrice} DA
     </div>
 
     <div style="margin-top:10px; display:flex; gap:10px;">
 
 <button onclick="deleteConfirmedOrder('${key}')"
 style="background:#e74c3c;color:white;border:none;padding:8px 12px;border-radius:6px;cursor:pointer;">
-🗑️ حذف
+🗑️ Supprimer
 </button>
 
 <button onclick='printInvoice(${JSON.stringify(order)})'
 style="background:#3498db;color:white;border:none;padding:8px 12px;border-radius:6px;cursor:pointer;">
-📄 إظهار الفاتورة
+📄 Afficher la facture 
 </button>
 
 </div>
@@ -822,7 +822,7 @@ style="background:#3498db;color:white;border:none;padding:8px 12px;border-radius
 
     window.deleteProduct = async function(id) {
   
-  if (!confirm("حذف هذا المنتج؟")) return;
+  if (!confirm("  Supprimer le produit؟")) return;
   
   try {
     
@@ -848,7 +848,7 @@ style="background:#3498db;color:white;border:none;padding:8px 12px;border-radius
           .remove([filePath]);
         
         if (error) {
-          console.log("خطأ حذف الصورة:", error);
+          console.log("erreur  :", error);
         }
         
       }
@@ -862,12 +862,12 @@ style="background:#3498db;color:white;border:none;padding:8px 12px;border-radius
     
     applySearchFilter();
     
-    showSuccess("✅ تم حذف المنتج والصورة");
+    showSuccess("✅  Le produit et l'image ont été supprimés.  ");
     
   } catch (error) {
     
     console.error(error);
-    alert("حدث خطأ أثناء الحذف");
+    alert(" Une erreur s'est produite lors de la suppression. ");
     
   }
   
@@ -888,7 +888,7 @@ style="background:#3498db;color:white;border:none;padding:8px 12px;border-radius
 
       const toggleBtn = document.getElementById("toggleVisibilityBtn");
       toggleBtn.style.display = "inline-block";
-      toggleBtn.textContent = p.hidden ? "إظهار المنتج" : "إخفاء المنتج";
+      toggleBtn.textContent = p.hidden ? "Afficher le produit" : "Masquer le produit";
 
       document.getElementById("addProductModal").style.display = "flex";
     };
@@ -900,7 +900,7 @@ style="background:#3498db;color:white;border:none;padding:8px 12px;border-radius
       const statusTxt = document.getElementById("uploadStatus");
 
       submitBtn.disabled = true;
-      submitBtn.textContent = "جاري الحفظ...";
+      submitBtn.textContent = " Sauvegarder...";
 const serial = document.getElementById("serial").value.trim();
       const name = document.getElementById("name").value.trim();
       const price = Number(document.getElementById("price").value);
@@ -917,9 +917,9 @@ let finalImageUrl = existingUrl;
 const selectedFile = fileInput.files[0] || cameraInput.files[0];
 
 try {
-  if (!name) throw new Error("اسم المنتج مطلوب.");
-  if (isNaN(price) || price <= 0) throw new Error("السعر غير صحيح.");
-  if (isNaN(pack) || pack <= 0) throw new Error("الكمية غير صحيحة.");
+  if (!name) throw new Error("Nom du produit requis.");
+  if (isNaN(price) || price <= 0) throw new Error(" Le prix est incorrect..");
+  if (isNaN(pack) || pack <= 0) throw new Error("  La quantité est incorrecte..");
   
   if (selectedFile) {
     statusTxt.style.display = "block";
@@ -939,10 +939,10 @@ try {
 
         if (id) {
           await update(ref(db, "products/" + id), productData);
-          showSuccess("✅ تم تعديل المنتج بنجاح");
+          showSuccess("✅ Le produit a été modifié avec succès");
         } else {
           await push(productsRef, productData);
-          showSuccess("✅ تم إضافة المنتج بنجاح");
+          showSuccess("✅ Le produit a été ajouté avec succès.");
         }
 
         document.getElementById("addProductModal").style.display = "none";
@@ -950,10 +950,10 @@ try {
 
       } catch (error) {
         console.error("Full save error:", error);
-        alert("⚠️ حدث خطأ:\n" + error.message);
+        alert("⚠️  Une erreur s'est produite.:\n" + error.message);
       } finally {
         submitBtn.disabled = false;
-        submitBtn.textContent = "حفظ";
+        submitBtn.textContent = "Sauvegarder";
         statusTxt.style.display = "none";
       }
     };
@@ -992,21 +992,21 @@ try {
   const pass = document.getElementById("adminPassword").value.trim();
   
   if (!user || !pass) {
-    alert("اكتب اسم المستخدم وكلمة السر");
+    alert("Saisissez votre nom d'utilisateur et votre mot de passe");
     return;
   }
   
   const snapshot = await get(ref(db, "sellers/" + user));
   
   if (!snapshot.exists()) {
-    alert("المستخدم غير موجود");
+    alert(" Utilisateur introuvable ");
     return;
   }
   
   const data = snapshot.val();
   
   if (data.password !== pass) {
-    alert("كلمة السر خاطئة");
+    alert("Mot de passe incorrect");
     return;
   }
   
@@ -1019,7 +1019,7 @@ try {
 };
 
     window.logout = function() {
-      if (confirm("تسجيل الخروج؟")) {
+      if (confirm(" Déconnexion؟")) {
         localStorage.removeItem("auth");
         location.reload();
       }
@@ -1040,8 +1040,8 @@ try {
       }
 
       set(ref(db, "store/cover"), { url: link })
-        .then(() => showSuccess("✅ تم حفظ الغلاف"))
-        .catch((err) => alert("حدث خطأ أثناء حفظ الغلاف: " + err.message));
+        .then(() => showSuccess("✅ Sauvez la couverture  "))
+        .catch((err) => alert("Une erreur s'est produite lors de l'enregistrement de la couverture.: " + err.message));
     };
 
     window.toggleCoverForm = function() {
@@ -1057,27 +1057,27 @@ try {
 
       update(ref(db, "products/" + id), { hidden: !current.hidden })
         .then(() => {
-          showSuccess(current.hidden ? "✅ تم إظهار المنتج" : "✅ تم إخفاء المنتج");
+          showSuccess(current.hidden ? "✅ Le produit était exposé" : "✅   Le produit a été caché.");
           document.getElementById("addProductModal").style.display = "none";
         })
         .catch((err) => {
-          alert("حدث خطأ أثناء تغيير حالة المنتج: " + err.message);
+          alert("Une erreur s'est produite lors de la modification du statut du produit.: " + err.message);
         });
     };
     window.deleteOrder = async function(id) {
   
-  if (!confirm("هل تريد حذف الطلب؟")) return;
+  if (!confirm("Voulez-vous supprimer la requête؟")) return;
   
   try {
     
     await remove(ref(db, "orders/" + id));
     
-    showSuccess("✅ تم حذف الطلب");
+    showSuccess("✅ La commande a été annulée.  ");
     
   } catch (error) {
     
     console.error(error);
-    alert("حدث خطأ أثناء حذف الطلب");
+    alert("Une erreur s'est produite lors de la suppression de la requête.");
     
   }
   
@@ -1087,7 +1087,7 @@ window.confirmAndPrint = async function(id) {
   const snapshot = await get(ref(db, "orders/" + id));
   
   if (!snapshot.exists()) {
-    alert("الطلب غير موجود");
+    alert("Requête introuvable");
     return;
   }
   
@@ -1099,7 +1099,7 @@ window.confirmAndPrint = async function(id) {
   
   await remove(ref(db, "orders/" + id));
   
-  showSuccess("✅ تم تأكيد الطلب");
+  showSuccess("✅ La commande a été confirmée."  );
   
   printInvoice(orderData);
   
@@ -1129,18 +1129,18 @@ window.confirmAndPrint = async function(id) {
     };
     window.deleteConfirmedOrder = async function(id) {
 
-  if (!confirm("هل تريد حذف هذه الطلبية؟")) return;
+  if (!confirm("Voulez-vous supprimer cette commande")) return;
 
   try {
 
     await remove(ref(db, "confirmedOrders/" + id));
 
-    showSuccess("✅ تم حذف الطلب");
+    showSuccess("✅ La requête a été supprimée.");
 
   } catch (error) {
 
     console.log(error);
-    alert("حدث خطأ أثناء الحذف");
+    alert("Une erreur s'est produite lors de la suppression.");
 
   }
 
@@ -1148,18 +1148,18 @@ window.confirmAndPrint = async function(id) {
 
 window.deleteAllConfirmed = async function() {
 
-  if (!confirm("هل تريد حذف جميع الطلبات المؤكدة؟")) return;
+  if (!confirm("Souhaitez-vous supprimer toutes les commandes confirmées")) return;
 
   try {
 
     await remove(ref(db, "confirmedOrders"));
 
-    showSuccess("✅ تم حذف جميع الطلبات");
+    showSuccess("✅ Toutes les demandes ont été supprimées.");
 
   } catch (error) {
 
     console.log(error);
-    alert("حدث خطأ أثناء الحذف");
+    alert("Une erreur s'est produite lors de la suppression.");
 
   }
 
@@ -1192,12 +1192,12 @@ document.getElementById("coverFile").addEventListener("change", async function()
       url: imageUrl
     });
     
-    showSuccess("✅ تم تغيير صورة الغلاف");
+    showSuccess("✅ L'image de couverture a été modifiée.");
     
   } catch (err) {
     
     console.log(err);
-    alert("فشل رفع الصورة");
+    alert("Échec du chargement de l'image");
     
   }
   
@@ -1331,7 +1331,7 @@ border:none;
 padding:10px 15px;
 border-radius:6px;
 cursor:pointer;">
-🖨️ طباعة
+🖨️ imprimer
 </button>
 
 </div>
@@ -1372,7 +1372,7 @@ window.addSeller = async function() {
   const pass = document.getElementById("newSellerPass").value.trim();
   
   if (!name || !pass) {
-    alert("اكتب الاسم وكلمة السر");
+    alert("Saisissez votre nom d'utilisateur et votre mot de passe");
     return;
   }
   
@@ -1380,7 +1380,7 @@ window.addSeller = async function() {
   password: pass
 });
 
-showSuccess("✅ تم إضافة البائع");
+showSuccess("✅ Le vendeur a été ajouté.");
 
 document.getElementById("newSellerName").value = "";
 document.getElementById("newSellerPass").value = "";
@@ -1414,7 +1414,7 @@ border:none;
 padding:4px 8px;
 border-radius:6px;
 cursor:pointer;">
-حذف
+supprimer
 </button>
 
 </div>
@@ -1426,7 +1426,7 @@ cursor:pointer;">
 
 window.deleteSeller = async function(name) {
   
-  if (!confirm("حذف البائع ؟")) return;
+  if (!confirm("Supprimer le vendeur")) return;
   
   await remove(ref(db, "sellers/" + name));
   
@@ -1456,12 +1456,12 @@ width:90%;
 max-width:400px;
 ">
 
-<h3>إدارة البائعين</h3>
+<h3>Gestion des fournisseurs</h3>
 
-<input id="newSellerName" placeholder="اسم البائع" 
+<input id="newSellerName" placeholder="Nom du vendeur" 
 style="width:100%;padding:8px;margin-bottom:8px;">
 
-<input id="newSellerPass" placeholder="كلمة السر" 
+<input id="newSellerPass" placeholder="mot de passe" 
 style="width:100%;padding:8px;margin-bottom:8px;">
 
 <button onclick="addSeller()" style="
@@ -1471,7 +1471,7 @@ border:none;
 padding:8px 12px;
 border-radius:6px;
 cursor:pointer;">
-➕ إضافة بائع
+➕  Ajouter un vendeur
 </button>
 
 <div id="sellersList" style="margin-top:15px;"></div>
@@ -1484,7 +1484,7 @@ border:none;
 padding:8px 12px;
 border-radius:6px;
 cursor:pointer;">
-إغلاق
+sortie
 </button>
 
 </div>
