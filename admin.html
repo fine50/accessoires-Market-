@@ -119,7 +119,7 @@
       width: 90%;
       max-width: 600px;
       text-align: left;
-  border-left: 5px solid #007cf0; #007cf0;
+  border-left: 5px solid #007cf0;
     }
 
     .order-header {
@@ -163,38 +163,45 @@
       opacity: 0.45;
     }
     @media print {
-  
+
   @page {
     size: A4;
     margin: 0;
   }
-  
+
   body {
     margin: 0;
     padding: 0;
     background: white;
-    font-size: 10px;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
+    font-size: 12px;
+    display: block; /* 🔴 بدل flex */
   }
-  
-  /* إخفاء زر الإغلاق وزر الطباعة */
+
+  /* إخفاء الأزرار */
   .no-print {
     display: none !important;
   }
-  
+
   #invoiceBox {
     width: 100%;
-    max-width: 100%;
-    margin: 0 auto;
+    margin: 0;
+    padding: 0;
     box-shadow: none;
   }
-  
-  tr {
-    height: 20px;
+
+  /* تثبيت رأس الجدول */
+  thead {
+    display: table-header-group;
   }
-  
+
+  tfoot {
+    display: table-footer-group;
+  }
+
+  tr {
+    page-break-inside: avoid;
+  }
+
 }
   </style>
 </head>
@@ -1221,7 +1228,8 @@ window.printInvoice = function(order) {
   font-size:9px;
   font-weight:400;
   width:100%;
-  white-space:nowrap;
+  white-space: normal;
+word-break: break-word;
   overflow:hidden;
   text-overflow:ellipsis;
 ">
