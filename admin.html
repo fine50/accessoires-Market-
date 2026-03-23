@@ -163,45 +163,55 @@
       opacity: 0.45;
     }
     @media print {
-
-  @page {
-    size: A4;
-    margin: 0;
+  /* إخفاء كل محتويات الموقع وإبقاء الفاتورة فقط */
+  body > *:not(#invoiceModal) { 
+    display: none !important; 
   }
 
-  body {
-    margin: 0;
-    padding: 0;
-    background: white;
-    font-size: 12px;
-    display: block; /* 🔴 بدل flex */
+  @page { 
+    size: A4; 
+    margin: 1cm; /* هامش الورقة الأساسي */
   }
 
-  /* إخفاء الأزرار */
-  .no-print {
-    display: none !important;
+  body { 
+    margin: 0; 
+    padding: 0; 
+    background: white !important; 
+    display: block !important; 
+    height: auto !important;
   }
 
-  #invoiceBox {
-    width: 100%;
-    margin: 0;
-    padding: 0;
-    box-shadow: none;
+  #invoiceModal { 
+    position: static !important; /* هام جداً للسماح بتمدد الفاتورة لعدة صفحات */
+    width: 100% !important; 
+    display: block !important; 
   }
 
-  /* تثبيت رأس الجدول */
-  thead {
-    display: table-header-group;
+  #invoiceBox { 
+    width: 95% !important; /* لترك مسافة بسيطة عن الحواف */
+    margin: 0 auto !important; /* توسيط الجدول */
+    padding: 0 !important;
+    box-shadow: none !important;
+    max-width: none !important;
   }
 
-  tfoot {
-    display: table-footer-group;
+  /* تكرار رأس الجدول في كل صفحة جديدة تلقائياً */
+  thead { 
+    display: table-header-group !important; 
   }
 
-  tr {
-    page-break-inside: avoid;
+  /* منع قص سطر المنتج الواحد بين صفحتين */
+  tr { 
+    page-break-inside: avoid !important; 
   }
 
+  /* تنسيق الجدول لضمان التدفق الصحيح */
+  table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+  }
+
+  .no-print { display: none !important; }
 }
   </style>
 </head>
@@ -1263,7 +1273,7 @@ word-break: break-word;
   modal.style.zIndex = "5000";
   
   modal.innerHTML = `
-<div id="invoiceBox" style="background:white;padding:30px;width:100%;max-width:900px;margin:auto;font-family:Arial;">
+<div id="invoiceBox" style="background:white; padding:20px; width:92%; margin: 0 auto; font-family:Arial;">
 
 <!-- Header -->
 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
