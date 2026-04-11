@@ -295,8 +295,15 @@
 
   // جلب الغلاف
   onValue(ref(db, 'store/cover'), (s) => {
-    if(s.val()) document.getElementById('coverImage').src = s.val().url;
-  });
+  const banner = document.querySelector('.banner');
+  const img = document.getElementById('coverImage');
+  if (s.exists() && s.val().url) {
+    img.src = s.val().url;
+    banner.style.display = 'block';
+  } else {
+    banner.style.display = 'none';
+  }
+});
 
   // جلب المنتجات
   onValue(ref(db, 'products'), (snapshot) => {
@@ -328,7 +335,7 @@
       const card = document.createElement('div');
       card.className = 'product-card';
       card.innerHTML = `
-        <img src="${p.imageUrl || p.img}" onclick="viewImage('${p.imageUrl || p.img}')" onerror="this.src='https://via.placeholder.com/150'">
+        <img src="${p.imageUrl || p.img || 'https://via.placeholder.com/150'}" onclick="viewImage('${p.imageUrl || p.img}')" loading="lazy">
         <div class="product-info">
           <h3>${p.name}</h3>
           <div class="product-price">${p.price} دج</div>
