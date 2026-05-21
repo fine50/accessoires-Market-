@@ -503,7 +503,7 @@ style="background:#3498db;color:white;border:none;border-radius:50%;width:45px;h
 <div id="adminMenu" 
 style="display:none;position:absolute;top:55px; right:0;background:white;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,0.2);padding:10px;min-width:150px;">
 
-<button onclick="openCoverUpload()" 
+<button onclick="document.getElementById('coverFile').click()" 
 style="width:100%;padding:8px;border:none;background:#3498db;color:white;border-radius:6px;margin-bottom:6px;cursor:pointer;">
   Changer la couverture
 </button>
@@ -547,16 +547,18 @@ style="width:100%;padding:8px;border:none;background:#e74c3c;color:white;border-
 
   <h1 class="admin-header">contrôle</h1>
   <div id="adminUserLabel" style="
-  text-align:center;
-  font-size:16px;
+  margin:0 16px 14px;
+  font-size:15px;
   font-weight:700;
   color:#1877f2;
-  margin-top:-5px;
-  margin-bottom:10px;
+  font-family:'Cairo',sans-serif;
 ">
 </div>
   <div class="tabs-container" id="tabsContainer" style="display:none;">
     <button class="tab-btn active" onclick="switchTab('products', this)">📦Produits </button>
+    <button class="tab-btn" onclick="switchTab('hidden', this)">
+🔒 Produits masqués
+</button>
     <button class="tab-btn" onclick="switchTab('orders', this)" style="position:relative;">
 
   🔔 Demandes entrantes
@@ -577,7 +579,7 @@ display:none;
 </button>
 
 <button class="tab-btn" onclick="switchTab('confirmed', this)">
-  📦  Demandes confirmées
+  ✅  Demandes confirmées
   
 </button>
 
@@ -607,7 +609,15 @@ display:none;
   </div>
 
   
+<div id="hiddenSection" style="display:none;">
 
+  <h3 style="color:#555;text-align:center;margin:15px 0;">
+    Produits masqués
+  </h3>
+
+  <div class="products-container" id="hiddenProductsContainer"></div>
+
+</div>
 
 <div id="ordersSection" style="display:none;">
   
@@ -1036,7 +1046,8 @@ pagination.style.marginTop = "20px";
       container.innerHTML = "";
 
       const source = getCurrentProductsList();
-      const productsArray = Object.entries(source || {});
+      const productsArray = Object.entries(source || {})
+  .filter(([_, product]) => !product.hidden);
 
       const totalPages = Math.max(1, Math.ceil(productsArray.length / productsPerPage));
       if (page > totalPages) page = 1;
@@ -1084,7 +1095,45 @@ pagination.style.marginTop = "20px";
 
       renderPagination(totalPages, page);
     }
+function renderHiddenProducts() {
+  
+  const container = document.getElementById("hiddenProductsContainer");
+  
+  container.innerHTML = "";
+  
+  const hiddenProducts = Object.entries(allProducts)
+    .filter(([_, product]) => product.hidden);
+  
+  if (hiddenProducts.length === 0) {
+    container.innerHTML = "<p style='text-align:center;'>Aucun produit masqué</p>";
+    return;
+  }
+  
+  hiddenProducts.forEach(([id, product]) => {
+    
+    const imageSrc = product.imageUrl || "https://via.placeholder.com/150";
+    
+    container.innerHTML += `
+      <div class="product">
 
+        <img src="${imageSrc}">
+
+        <h3>${product.name || ""}</h3>
+
+        <div class="price">
+          ${Number(product.price || 0)} DA
+        </div>
+
+        <div>quantité: ${Number(product.pack || 0)}</div>
+
+        <button class="edit-btn" onclick="editProduct('${id}')">
+          Modifier
+        </button>
+
+      </div>
+    `;
+  });
+}
     function showPage(page) {
       currentPage = page;
       renderProductsPage(page);
@@ -1130,10 +1179,16 @@ pagination.style.marginTop = "20px";
 }
 
     onValue(productsRef, (snapshot) => {
-      allProducts = snapshot.val() || {};
-      filteredProducts = { ...allProducts };
-      renderProductsPage(currentPage);
-    });
+  
+  allProducts = snapshot.val() || {};
+  
+  filteredProducts = { ...allProducts };
+  
+  renderProductsPage(currentPage);
+  
+  renderHiddenProducts();
+  
+});
 
     onValue(ordersRef, (snapshot) => {
   
@@ -1474,6 +1529,8 @@ alert("⚠️ فشل رفع المنتج السابق: " + name);
 
       document.getElementById("ordersSection").style.display =
         tabName === "orders" ? "block" : "none";
+        document.getElementById("hiddenSection").style.display =
+  tabName === "hidden" ? "block" : "none";
         document.getElementById("confirmedSection").style.display =
   tabName === "confirmed" ? "block" : "none";
 
@@ -1556,10 +1613,10 @@ window.checkPassword = async function() {
       
       // Seller: يشوف كل شيء بس القائمة معطلة
       if (role === "seller") {
-        document.getElementById("adminMenu").style.display = "block";
-      } else if (role === "admin" || role === "owner") {
-        document.getElementById("adminMenu").style.display = "block";
-      }
+  document.getElementById("adminMenu").style.display = "none";
+} else if (role === "admin" || role === "owner") {
+  document.getElementById("adminMenu").style.display = "none";
+}
       
       document.getElementById("loginModal").style.display = "none";
       document.getElementById("adminUserLabel").textContent =
@@ -1569,18 +1626,34 @@ window.checkPassword = async function() {
     }
 
 
-    window.saveCoverImage = function() {
-      const link = document.getElementById("coverInput").value.trim();
-
-      if (!link) {
-        alert("الرجاء إدخال رابط صورة الغلاف.");
-        return;
-      }
-
-      set(ref(db, "store/cover"), { url: link })
-        .then(() => showSuccess("✅ Sauvez la couverture  "))
-        .catch((err) => alert("Une erreur s'est produite lors de l'enregistrement de la couverture.: " + err.message));
-    };
+    document.getElementById("coverFile").addEventListener("change", async function(e) {
+  
+  const file = e.target.files[0];
+  
+  if (!file) return;
+  
+  try {
+    
+    showSuccess("⏳ Upload couverture...");
+    
+    const imageData = await uploadImageToImgBB(file);
+    
+    await set(ref(db, "store/cover"), {
+      url: imageData.url,
+      deleteUrl: imageData.deleteUrl
+    });
+    
+    showSuccess("✅ Couverture mise à jour");
+    
+  } catch (error) {
+    
+    console.error(error);
+    
+    alert("Erreur upload couverture");
+    
+  }
+  
+});
 
     window.toggleCoverForm = function() {
   const f = document.getElementById("coverForm");
@@ -1693,8 +1766,12 @@ window.checkClientSecret = async function() {
       onValue(ref(db, "store/cover"), (snapshot) => {
         const data = snapshot.val();
         if (data && data.url) {
-          document.getElementById("coverImage").src = data.url;
-        }
+  
+  document.getElementById("coverBanner").style.display = "block";
+  
+  document.getElementById("coverImage").src = data.url;
+  
+}
       });
     };
     window.deleteConfirmedOrder = async function(id) {
