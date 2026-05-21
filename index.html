@@ -87,12 +87,20 @@ header {
   padding: 12px;
 }
 
-#coverImage {
+.banner {
   width: 100%;
-  height: 160px;
-  object-fit: cover;
-  border-radius: 22px;
-  box-shadow: var(--shadow);
+  padding: 0;
+  margin: 0;
+}
+
+#coverImage {
+  width: 100vw;
+  height: auto;
+  max-height: 160px;
+  object-fit: contain;
+  display: block;
+  border-radius: 0;
+  margin-right: calc(50% - 50vw);
 }
 
 /* CATEGORIES */
@@ -612,6 +620,21 @@ renderPagination(totalPages, state.currentPage);
       </div>`;
     });
     document.getElementById('cartTotal').innerText = `المجموع الكلي: ${total.toLocaleString()} دج`;
+    list.innerHTML += `
+  <button onclick="clearCart()" style="
+    width:100%;
+    margin-top:15px;
+    padding:12px;
+    border:none;
+    border-radius:12px;
+    background:#e74c3c;
+    color:white;
+    font-weight:bold;
+    cursor:pointer;
+  ">
+    🗑️ مسح السلة
+  </button>
+`;
     document.getElementById('cartModal').style.display = 'flex';
   };
 
@@ -755,6 +778,27 @@ window.manualQty = (id, val) => {
 
   localStorage.setItem('cart', JSON.stringify(state.cart));
   renderUI(); // تحديث الصفحة لرؤية النتائج
+};
+window.clearCart = () => {
+  
+  if (state.cart.length === 0) {
+    alert("السلة فارغة");
+    return;
+  }
+  
+  state.cart = [];
+  
+  localStorage.removeItem("cart");
+  
+  updateCartBadge();
+  
+  document.getElementById('cartItemsList').innerHTML = "";
+  
+  document.getElementById('cartTotal').innerText =
+    "المجموع الكلي: 0 دج";
+  
+  renderUI();
+  
 };
 window.toggleVIPBox = function() {
   
