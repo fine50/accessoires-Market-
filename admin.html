@@ -1829,9 +1829,23 @@ function renderLandingList() {
 }
 
 function buildLandingUrl(productId) {
-  const href = window.location.href.split('?')[0].split('#')[0];
-  const base = href.replace(/admin\.html$/i, '');
-  return base + 'product.html?id=' + encodeURIComponent(productId);
+  /* ✅ استخدم URL API — تعمل في كل الحالات */
+  const url = new URL(window.location.href);
+  let path = url.pathname;
+  const lastSlash = path.lastIndexOf('/');
+  
+  let dir;
+  if (lastSlash === -1) {
+    dir = '/';
+  } else if (lastSlash === path.length - 1) {
+    /* المسار ينتهي بـ / — هو مجلد بالفعل */
+    dir = path;
+  } else {
+    /* المسار ينتهي بملف — احذفه وابق على المجلد */
+    dir = path.substring(0, lastSlash + 1);
+  }
+  
+  return url.origin + dir + 'product.html?id=' + encodeURIComponent(productId);
 }
 function copyLandingUrl(productId) {
   const url = buildLandingUrl(productId);
