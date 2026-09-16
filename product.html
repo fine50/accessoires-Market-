@@ -9,7 +9,6 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 <script src="config.js"></script>
 
-<!-- TikTok Pixel -->
 <script>
 !function (w, d, t) {
   w.TiktokAnalyticsObject=t;
@@ -26,7 +25,6 @@
 }(window, document, 'ttq');
 </script>
 
-<!-- Facebook Pixel -->
 <script>
 (function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)})(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
 </script>
@@ -122,7 +120,6 @@ header.store-header{
 }
 .checkout-heading .subtitle{display:block;font-size:.78rem;color:var(--muted);font-weight:600;margin-top:8px}
 
-/* Bundle Box */
 .bundle-offer-box{
   background:linear-gradient(135deg,#ecfdf5,#d1fae5);
   border:2px dashed #10b981;
@@ -236,14 +233,33 @@ header.store-header{
 .bundle-progress{
   background:rgba(255,255,255,.85);
   border-radius:12px;padding:10px 14px;
-  text-align:center;font-size:.78rem;font-weight:700;color:var(--primary-dark);
-  position:relative;z-index:1;line-height:1.6;margin-top:8px;
+  text-align:center;font-size:.78rem;
+  font-weight:400;
+  color:var(--primary-dark);
+  position:relative;z-index:1;line-height:1.8;margin-top:8px;
+  letter-spacing:.1px;
 }
 .bundle-progress.success{
   background:linear-gradient(135deg,#d1fae5,#a7f3d0);color:#065f46;
 }
-.bundle-progress strong{color:#dc2626;font-size:1rem}
+.bundle-progress.promote{
+  background:linear-gradient(135deg,#fef3c7,#fde68a);
+  border:1.5px dashed #f59e0b;
+  color:#92400e;
+}
+.bundle-progress strong{color:#dc2626;font-size:.88rem;font-weight:600}
 .bundle-progress.success strong{color:#059669}
+.bundle-progress.promote strong{color:#b45309}
+
+.bundle-progress .free-hint{
+  display:block;
+  margin-top:5px;
+  font-size:.72rem;
+  font-weight:400;
+  color:#059669;
+  letter-spacing:.2px;
+}
+.bundle-progress.promote .free-hint{color:#047857}
 
 .bundle-selection-pill{
   flex:1;display:flex;align-items:center;justify-content:center;gap:8px;
@@ -292,7 +308,6 @@ header.store-header{
 .field-row-2 .field-group{margin-bottom:0}
 @media(max-width:520px){.field-row-2{grid-template-columns:1fr;gap:12px}}
 
-/* Summary Panel */
 .summary-panel{
   background:linear-gradient(135deg,#f0fdf4,#ecfdf5);border:1.5px solid #a7f3d0;
   border-radius:20px;padding:16px 18px;margin:20px 0 16px;
@@ -488,7 +503,9 @@ footer a{color:var(--primary);text-decoration:none;font-weight:700;display:inlin
   .bundle-tier-card .tier-per-unit{font-size:.62rem;padding-top:6px;margin-top:6px}
   .bundle-tier-card .tier-savings{font-size:.55rem;padding:2px 6px}
   .bundle-tier-card .best-badge{font-size:.55rem;padding:2px 8px;top:5px;right:5px}
-  .bundle-progress{font-size:.72rem;padding:8px 12px}
+  .bundle-progress{font-size:.72rem;padding:8px 12px;line-height:1.7}
+  .bundle-progress strong{font-size:.82rem}
+  .bundle-progress .free-hint{font-size:.68rem}
   .field-group{margin-bottom:12px}
   .field-group label{font-size:.72rem;margin-bottom:6px}
   .field-group input,.field-group select{padding:12px 18px;font-size:.85rem}
@@ -938,6 +955,15 @@ function findCheapestTierForQty(quantity) {
   return { ...best, perUnit: bestPerUnit };
 }
 
+function findNextTierAboveQty(quantity) {
+  if (!bundleConfig || !bundleConfig.tiers || !bundleConfig.tiers.length) return null;
+  const sorted = [...bundleConfig.tiers].sort((a, b) => a.qty - b.qty);
+  for (const tier of sorted) {
+    if (tier.qty > quantity) return tier;
+  }
+  return null;
+}
+
 function calculateSubtotal(quantity) {
   const tier = findCheapestTierForQty(quantity);
   if (tier) return Math.floor(tier.perUnit) * quantity;
@@ -948,7 +974,6 @@ function isFreeShippingActive(quantity) {
   return !!(bundleConfig?.freeShipping?.enabled && quantity >= bundleConfig.freeShipping.minQty);
 }
 
-/* ═══ 🎯 إيجاد نص الكمية المناسب (بدون تكرار) ═══ */
 function getQtyLabel(q) {
   if (q === 2) return 'قطعتان';
   if (q >= 3 && q <= 10) return `${q} قطع`;
@@ -1113,12 +1138,12 @@ function renderPage(landingSettings) {
   if (b && b.enabled === true) {
     const tiers = Array.isArray(b.tiers) ? b.tiers
       .map(t => ({ qty: parseInt(t.qty) || 0, totalPrice: parseFloat(t.totalPrice) || 0 }))
-      .filter(t => t.qty >= 2 && t.totalPrice > 0 && (t.totalPrice / t.qty) < baseUnitPrice)
+      .filter(t => t.qty >= 2 && t.totalPrice > 0)
       .sort((a, b2) => a.qty - b2.qty) : [];
     const fs = b.freeShipping && b.freeShipping.enabled ? {
       enabled: true,
       minQty: parseInt(b.freeShipping.minQty) || 0,
-      label: b.freeShipping.label || "🎁 التوصيل علينا"
+      label: b.freeShipping.label || "🎁 التوصيل مجاني"
     } : { enabled: false };
     if (tiers.length || fs.enabled) {
       bundleConfig = {
@@ -1260,7 +1285,7 @@ function findShippingFor(wilaya, deliveryType) {
   return 0;
 }
 
-/* ═══════════════ Update Totals — مع Math.floor ═══════════════ */
+/* ═══════════════ Update Totals ═══════════════ */
 function updateTotals() {
   const currentQty = selectedTier ? selectedTier.qty : qty;
 
@@ -1272,7 +1297,6 @@ function updateTotals() {
   } else {
     tierUsed = findCheapestTierForQty(currentQty);
     if (tierUsed) {
-      /* ✅ Math.floor لتفادي 8333.33 × 6 = 49999.98 → 49998 */
       subtotal = Math.floor(tierUsed.perUnit) * currentQty;
     } else {
       subtotal = baseUnitPrice * currentQty;
@@ -1286,7 +1310,6 @@ function updateTotals() {
   activeShippingCost = freeActive ? 0 : baseShipping;
   const total = subtotal + activeShippingCost;
 
-  /* ═══ تحديث التفاصيل ═══ */
   $("brQty").textContent = currentQty;
   $("brSubtotal").textContent = fmt(subtotal) + " " + storeInfo.currency;
 
@@ -1306,7 +1329,6 @@ function updateTotals() {
   $("floatingPrice").textContent = fmt(total);
   $("floatingCurrency").textContent = storeInfo.currency;
 
-  /* ═══ السعر الرئيسي — Math.floor ═══ */
   const cp = $("currentPrice");
   if (tierUsed && tierUsed.perUnit < baseUnitPrice) {
     cp.classList.add("bundle-active");
@@ -1316,7 +1338,6 @@ function updateTotals() {
     cp.textContent = fmt(baseUnitPrice);
   }
 
-  /* ═══ شارة التوفير ═══ */
   const savingsBadge = $("bundleSavingsBadge");
   const normalPrice = baseUnitPrice * currentQty;
   const realSavings = normalPrice - subtotal;
@@ -1327,22 +1348,40 @@ function updateTotals() {
     savingsBadge.style.display = "none";
   }
 
-  /* ═══ شريط التقدم — Math.floor ═══ */
+  /* ═══════════════════════════════════════════════════
+     ✅ شريط التحفيز — عرض السعر الفردي (أرخص نفسياً)
+     ═══════════════════════════════════════════════════ */
   const prog = $("bundleProgress");
   if (bundleConfig && bundleConfig.tiers.length > 0) {
     prog.style.display = "block";
-    if (tierUsed && tierUsed.perUnit < baseUnitPrice) {
-      prog.className = "bundle-progress success";
-      prog.innerHTML = `🎉 تم تفعيل عرض <strong>${tierUsed.qty} قطع</strong> بسعر <strong>${fmt(Math.floor(tierUsed.perUnit))} ${storeInfo.currency}</strong> للقطعة`;
-    } else {
-      const next = bundleConfig.tiers[0];
-      if (next) {
-        const remain = next.qty - currentQty;
-        prog.className = "bundle-progress";
-        prog.innerHTML = `📦 أضف <strong>${remain}</strong> ${remain === 1 ? 'قطعة' : 'قطع'} أخرى للاستفادة من عرض <strong>${next.qty} قطع بـ ${fmt(next.totalPrice)} ${storeInfo.currency}</strong>`;
-      } else {
-        prog.style.display = "none";
+    const nextTier = findNextTierAboveQty(currentQty);
+    
+    if (nextTier) {
+      const remain = nextTier.qty - currentQty;
+      const perUnit = Math.floor(nextTier.totalPrice / nextTier.qty);
+      prog.className = "bundle-progress promote";
+      
+      let remainText;
+      if (remain === 1) remainText = 'قطعة واحدة';
+      else if (remain === 2) remainText = 'قطعتين';
+      else remainText = `${remain} قطع`;
+      
+      const willHaveFreeShipping = bundleConfig.freeShipping?.enabled 
+        && nextTier.qty >= bundleConfig.freeShipping.minQty;
+      
+      /* ✅ عرض السعر الفردي بدل الإجمالي */
+      let html = `📦 أضف <strong>${remainText}</strong> أخرى للاستفادة من سعر <strong>${fmt(perUnit)} ${storeInfo.currency}</strong> للقطعة الواحدة`;
+      
+      if (willHaveFreeShipping) {
+        html += `<span class="free-hint">مع ${esc(bundleConfig.freeShipping.label)}</span>`;
       }
+      
+      prog.innerHTML = html;
+    } else if (tierUsed && tierUsed.perUnit < baseUnitPrice) {
+      prog.className = "bundle-progress success";
+      prog.innerHTML = `🎉 لقد حصلت على <strong>أفضل عرض متاح</strong> — سعر <strong>${fmt(Math.floor(tierUsed.perUnit))} ${storeInfo.currency}</strong> للقطعة`;
+    } else {
+      prog.style.display = "none";
     }
   } else {
     prog.style.display = "none";
@@ -1414,7 +1453,6 @@ async function executeOrder() {
     tierUsed = { qty: selectedTier.qty, totalPrice: selectedTier.totalPrice, perUnit: selectedTier.totalPrice / selectedTier.qty };
   } else {
     tierUsed = findCheapestTierForQty(currentQty);
-    /* ✅ Math.floor */
     subtotal = tierUsed ? Math.floor(tierUsed.perUnit) * currentQty : baseUnitPrice * currentQty;
   }
   const baseShipping = findShippingFor(wilaya, deliveryType);
@@ -1440,7 +1478,6 @@ async function executeOrder() {
   const orig = btn.innerHTML;
   btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الإرسال...';
 
-  /* ✅ Math.floor */
   const effectiveUnitPrice = tierUsed ? Math.floor(tierUsed.perUnit) : baseUnitPrice;
   const bundleApplied = !!(tierUsed && tierUsed.perUnit < baseUnitPrice);
 
