@@ -50,9 +50,45 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);direction:rt
 #noticeScreen h2{font-weight:800;color:#64748b;margin-bottom:8px;font-size:1.3rem}
 #noticeScreen p{font-size:.9rem;max-width:400px}
 
-.announcement{background:linear-gradient(135deg,var(--primary-dark),var(--primary));color:#fff;font-size:.78rem;font-weight:600;padding:9px 0;text-align:center;overflow:hidden;white-space:nowrap}
-.announcement .slide{display:inline-block;padding-right:100%;animation:scrollText 22s linear infinite}
-@keyframes scrollText{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+/* ═══════════════════════════════════════════════════════
+   شريط الإعلانات — Marquee مع فراغ بين التكرارات
+   ═══════════════════════════════════════════════════════ */
+.announcement{
+  background:linear-gradient(135deg,var(--primary-dark),var(--primary));
+  color:#fff;
+  font-size:.78rem;
+  font-weight:600;
+  padding:9px 0;
+  overflow:hidden;
+  position:relative;
+  direction:ltr;
+  white-space:nowrap;
+}
+.marquee-track{
+  display:inline-flex;
+  white-space:nowrap;
+  will-change:transform;
+  animation:marqueeScrollLTR 30s linear infinite;
+}
+.marquee-track.ar{
+  animation:marqueeScrollRTL 30s linear infinite;
+}
+.marquee-text {
+  display: inline-block;
+  padding: 0 1.5rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+  direction: rtl;
+  unicode-bidi: isolate;
+}
+@keyframes marqueeScrollLTR{
+  0%   { transform:translateX(0); }
+  100% { transform:translateX(-50%); }
+}
+@keyframes marqueeScrollRTL{
+  0%   { transform:translateX(0); }
+  100% { transform:translateX(50%); }
+}
 
 header.store-header{
   position:sticky;top:0;z-index:1100;
@@ -95,11 +131,13 @@ header.store-header{
 .discount-ribbon.special{background:linear-gradient(135deg,#0891b2,#06b6d4);box-shadow:0 4px 14px rgba(6,182,212,.25)}
 
 .live-visitors{display:inline-flex;align-items:center;gap:8px;background:#ecfdf5;border:1px solid #a7f3d0;padding:6px 14px;border-radius:30px;font-size:.78rem;font-weight:700;color:#065f46;margin-top:8px}
+.live-visitors i{color:#10b981;font-size:.8rem}
 .live-dot{width:8px;height:8px;background:#10b981;border-radius:50%;animation:glow 1.5s infinite}
 @keyframes glow{0%,100%{transform:scale(1);opacity:1;box-shadow:0 0 0 0 rgba(16,185,129,.5)}50%{transform:scale(1.2);opacity:.7;box-shadow:0 0 0 6px rgba(16,185,129,0)}}
 
 .countdown-box{background:linear-gradient(135deg,#fef3c7,#fed7aa);border:2px solid #f59e0b;border-radius:16px;padding:12px 16px;text-align:center;margin-top:12px}
-.countdown-box .label{font-size:.78rem;color:#92400e;font-weight:700;margin-bottom:4px}
+.countdown-box .label{font-size:.78rem;color:#92400e;font-weight:700;margin-bottom:4px;display:flex;align-items:center;justify-content:center;gap:6px}
+.countdown-box .label i{color:#d97706}
 .countdown-box .timer{font-size:1.2rem;font-weight:900;color:#dc2626;font-variant-numeric:tabular-nums;direction:ltr}
 
 .checkout-card{
@@ -118,7 +156,7 @@ header.store-header{
   color:var(--primary);background:#f0fdf4;padding:8px 18px;border-radius:var(--radius-pill);
   border:1px solid #a7f3d0;
 }
-.checkout-heading .subtitle{display:block;font-size:.78rem;color:var(--muted);font-weight:600;margin-top:8px}
+.checkout-heading .title-row i{color:var(--primary);font-size:1.05rem}
 
 .bundle-offer-box{
   background:linear-gradient(135deg,#ecfdf5,#d1fae5);
@@ -168,11 +206,13 @@ header.store-header{
   transform:translateY(-2px);
 }
 .bundle-tier-card.selected::after{
-  content:'✓';
+  content:'\f00c';
+  font-family:'Font Awesome 6 Free';
+  font-weight:900;
   position:absolute;top:6px;left:6px;
   width:22px;height:22px;background:var(--primary);color:#fff;
   border-radius:50%;display:flex;align-items:center;justify-content:center;
-  font-weight:900;font-size:.7rem;box-shadow:0 2px 6px rgba(11,110,79,.3);
+  font-size:.7rem;box-shadow:0 2px 6px rgba(11,110,79,.3);
 }
 .bundle-tier-card .tier-qty{
   font-size:.8rem;font-weight:800;color:var(--primary-dark);
@@ -191,11 +231,12 @@ header.store-header{
   padding-top:8px;border-top:1px dashed #a7f3d0;margin-top:8px;
 }
 .bundle-tier-card .tier-savings{
-  display:inline-block;
+  display:inline-flex;align-items:center;gap:4px;
   background:linear-gradient(135deg,#dc2626,#991b1b);
   color:#fff;padding:2px 8px;border-radius:20px;
   font-size:.6rem;font-weight:800;margin-top:6px;
 }
+.bundle-tier-card .tier-savings i{font-size:.55rem}
 .bundle-tier-card .best-badge{
   position:absolute;top:6px;right:6px;
   background:linear-gradient(135deg,#f59e0b,#d97706);
@@ -205,7 +246,9 @@ header.store-header{
   z-index:2;
   letter-spacing:.3px;
   line-height:1.2;
+  display:inline-flex;align-items:center;gap:4px;
 }
+.bundle-tier-card .best-badge i{font-size:.55rem}
 
 .bundle-or-divider{
   display:flex;align-items:center;gap:10px;margin:12px 0;
@@ -250,9 +293,10 @@ header.store-header{
 .bundle-progress strong{color:#dc2626;font-size:.88rem;font-weight:600}
 .bundle-progress.success strong{color:#059669}
 .bundle-progress.promote strong{color:#b45309}
+.bundle-progress i.inline-ico{font-size:.78rem;margin:0 3px}
 
 .bundle-progress .free-hint{
-  display:block;
+  display:flex;align-items:center;justify-content:center;gap:5px;
   margin-top:5px;
   font-size:.72rem;
   font-weight:400;
@@ -260,6 +304,7 @@ header.store-header{
   letter-spacing:.2px;
 }
 .bundle-progress.promote .free-hint{color:#047857}
+.bundle-progress .free-hint i{font-size:.72rem}
 
 .bundle-selection-pill{
   flex:1;display:flex;align-items:center;justify-content:center;gap:8px;
@@ -283,40 +328,80 @@ header.store-header{
 }
 .bundle-selection-pill .change-btn:hover{background:var(--primary);color:#fff}
 
-.field-group{margin-bottom:14px;position:relative}
+.field-group{margin-bottom:10px;position:relative}
 .field-group label{
-  display:flex;align-items:center;gap:6px;font-size:.78rem;font-weight:800;color:#334155;
-  margin-bottom:7px;padding-right:6px;
+  display:flex;align-items:center;gap:6px;font-size:.76rem;font-weight:800;color:#334155;
+  margin-bottom:4px;padding-right:6px;
 }
-.field-group label i{color:var(--primary);font-size:.75rem;width:14px;text-align:center}
+.field-group label i{color:var(--primary);font-size:.72rem;width:14px;text-align:center}
 .field-group input,.field-group select{
-  width:100%;padding:14px 22px;border:2px solid var(--border);
-  border-radius:var(--radius-pill);font-family:var(--font);font-size:.92rem;font-weight:600;
+  width:100%;padding:10px 18px;border:2px solid var(--border);
+  border-radius:var(--radius-pill);font-family:var(--font);font-size:.86rem;font-weight:600;
   background:#fff;outline:none;color:var(--text);transition:.25s ease;
   -webkit-appearance:none;appearance:none;
 }
-.field-group input::placeholder{color:#94a3b8;font-weight:500;font-size:.88rem}
+.field-group input::placeholder{color:#94a3b8;font-weight:500;font-size:.82rem}
 .field-group input:focus,.field-group select:focus{
   border-color:var(--primary);box-shadow:0 0 0 4px rgba(11,110,79,.1);background:#fff;
 }
 .field-group select{
-  padding-left:44px;
+  padding-left:40px;
   background-image:url("data:image/svg+xml;charset=UTF-8,%3Csvg width='12' height='8' viewBox='0 0 12 8' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M6 8L0 0h12z' fill='%230b6e4f'/%3E%3C/svg%3E");
-  background-repeat:no-repeat;background-position:left 20px center;cursor:pointer;
+  background-repeat:no-repeat;background-position:left 18px center;cursor:pointer;
 }
-.field-row-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.field-row-2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
 .field-row-2 .field-group{margin-bottom:0}
-@media(max-width:520px){.field-row-2{grid-template-columns:1fr;gap:12px}}
+@media(max-width:520px){.field-row-2{grid-template-columns:1fr;gap:10px}}
+
+.delivery-type-group{
+  display:grid;grid-template-columns:1fr 1fr;gap:8px;
+  margin-bottom:10px;
+}
+.delivery-option{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  padding:11px 14px;
+  border:2px solid var(--border);
+  border-radius:var(--radius-pill);
+  background:#fff;
+  cursor:pointer;
+  transition:.25s ease;
+  font-family:var(--font);
+  font-size:.86rem;
+  font-weight:700;
+  color:#475569;
+  user-select:none;
+  position:relative;
+}
+.delivery-option:hover{
+  border-color:var(--primary-light);
+  background:#f0fdf4;
+}
+.delivery-option.active{
+  border-color:var(--primary);
+  background:linear-gradient(135deg,#f0fdf4,#a7f3d0);
+  color:var(--primary-dark);
+  box-shadow:0 4px 12px rgba(11,110,79,.15);
+}
+.delivery-option i{
+  font-size:1rem;
+  color:var(--muted);
+  transition:.2s;
+}
+.delivery-option.active i{
+  color:var(--primary);
+}
+.delivery-option input{display:none}
 
 .summary-panel{
   background:linear-gradient(135deg,#f0fdf4,#ecfdf5);border:1.5px solid #a7f3d0;
-  border-radius:20px;padding:16px 18px;margin:20px 0 16px;
+  border-radius:20px;padding:16px 18px;margin:16px 0 14px;
 }
 .summary-panel .label{
   font-size:.85rem;color:#065f46;font-weight:800;margin-bottom:10px;
   display:flex;align-items:center;justify-content:center;gap:6px;
   padding-bottom:10px;border-bottom:1.5px dashed #a7f3d0;
 }
+.summary-panel .label i{color:var(--primary)}
 .summary-panel .breakdown{
   display:flex;flex-direction:column;gap:2px;
   text-align:right;
@@ -350,12 +435,12 @@ header.store-header{
   font-size:1.4rem;font-weight:900;color:var(--primary);
 }
 .summary-panel .bundle-savings{
-  display:block;text-align:center;
+  display:flex;align-items:center;justify-content:center;gap:6px;
   background:linear-gradient(135deg,#fef3c7,#fde68a);
   color:#92400e;padding:6px 14px;border-radius:30px;
   font-size:.78rem;font-weight:800;margin-top:10px;border:1px solid #f59e0b;
 }
-.summary-panel .bundle-savings i{color:#d97706;margin-left:4px}
+.summary-panel .bundle-savings i{color:#d97706;font-size:.85rem}
 .summary-panel .bundle-savings strong{color:#dc2626}
 
 .action-row{display:flex;gap:12px;align-items:center}
@@ -449,7 +534,11 @@ header.store-header{
 .review-head .stars{color:#f59e0b;font-size:.85rem;letter-spacing:1px}
 .review-body{font-size:.85rem;color:#64748b;line-height:1.6}
 .review-form-box{background:#f0fdf4;border:2px dashed #a7f3d0;padding:18px;border-radius:14px;margin-bottom:16px;display:none}
-.review-form-box h4{color:#065f46;font-weight:800;font-size:.9rem;margin-bottom:12px;text-align:center}
+.review-form-box h4{
+  color:#065f46;font-weight:800;font-size:.9rem;margin-bottom:12px;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+}
+.review-form-box h4 i{color:var(--primary)}
 .stars-input{display:flex;justify-content:center;gap:8px;font-size:1.4rem;color:#cbd5e1;cursor:pointer;margin-bottom:12px}
 .stars-input i.active{color:#f59e0b}
 .review-form-box input,.review-form-box textarea{width:100%;padding:12px 18px;border:2px solid var(--border);border-radius:var(--radius-pill);font-family:var(--font);font-size:.88rem;background:#fff;outline:none;margin-bottom:10px}
@@ -470,6 +559,7 @@ footer a{color:var(--primary);text-decoration:none;font-weight:700;display:inlin
 @media(max-width:640px){
   body{padding-bottom:78px;font-size:14px}
   .announcement{font-size:.65rem;padding:6px 0}
+  .marquee-text{padding:0 1rem}
   header.store-header{padding:7px 12px}
   .brand{font-size:.9rem;gap:6px}
   .brand img{height:2rem;max-width:60px}
@@ -491,7 +581,6 @@ footer a{color:var(--primary);text-decoration:none;font-weight:700;display:inlin
   .checkout-card{padding:18px 14px 16px;border-radius:18px}
   .checkout-heading{margin-bottom:16px}
   .checkout-heading .title-row{font-size:.92rem;padding:7px 14px;gap:7px}
-  .checkout-heading .subtitle{font-size:.72rem}
   .bundle-offer-box{padding:14px 12px;margin-bottom:14px;border-radius:16px}
   .bundle-offer-header{font-size:.85rem;margin-bottom:12px;padding-bottom:10px}
   .bundle-offer-header .gift-icon{width:28px;height:28px;font-size:.9rem}
@@ -506,13 +595,16 @@ footer a{color:var(--primary);text-decoration:none;font-weight:700;display:inlin
   .bundle-progress{font-size:.72rem;padding:8px 12px;line-height:1.7}
   .bundle-progress strong{font-size:.82rem}
   .bundle-progress .free-hint{font-size:.68rem}
-  .field-group{margin-bottom:12px}
-  .field-group label{font-size:.72rem;margin-bottom:6px}
-  .field-group input,.field-group select{padding:12px 18px;font-size:.85rem}
-  .field-group input::placeholder{font-size:.82rem}
-  .field-group select{padding-left:38px;background-position:left 16px center}
-  .field-row-2{gap:10px;margin-bottom:12px}
-  .summary-panel{padding:14px 14px;margin:16px 0 12px;border-radius:16px}
+  .field-group{margin-bottom:8px}
+  .field-group label{font-size:.7rem;margin-bottom:4px}
+  .field-group input,.field-group select{padding:9px 16px;font-size:.82rem}
+  .field-group input::placeholder{font-size:.78rem}
+  .field-group select{padding-left:36px;background-position:left 14px center}
+  .field-row-2{gap:8px;margin-bottom:8px}
+  .delivery-type-group{gap:6px;margin-bottom:8px}
+  .delivery-option{padding:9px 10px;font-size:.78rem;gap:6px}
+  .delivery-option i{font-size:.9rem}
+  .summary-panel{padding:14px 14px;margin:14px 0 12px;border-radius:16px}
   .summary-panel .label{font-size:.78rem;margin-bottom:8px;padding-bottom:8px}
   .summary-panel .breakdown{padding:10px 12px}
   .summary-panel .breakdown-row{font-size:.78rem;padding:6px 0}
@@ -557,7 +649,10 @@ footer a{color:var(--primary);text-decoration:none;font-weight:700;display:inlin
 <div id="appContainer" style="display:none;">
 
   <div class="announcement" id="announcementBar" style="display:none;">
-    <span class="slide" id="announcementText"></span>
+    <div class="marquee-track" id="marqueeTrack">
+      <span class="marquee-text" id="announcementText"></span>
+      <span class="marquee-text" id="announcementText2"></span>
+    </div>
   </div>
 
   <header class="store-header">
@@ -594,7 +689,7 @@ footer a{color:var(--primary);text-decoration:none;font-weight:700;display:inlin
         </div>
         <div class="live-visitors" id="liveVisitorsBox" style="display:none;">
           <span class="live-dot"></span>
-          <span>👀 يشاهد المنتج الآن: <strong id="liveCount">1</strong></span>
+          <span><i class="fas fa-eye"></i> يشاهد المنتج الآن: <strong id="liveCount">1</strong></span>
         </div>
         <div class="countdown-box" id="countdownBox" style="display:none;">
           <div class="label"><i class="far fa-clock"></i> ينتهي العرض الخاص بعد</div>
@@ -608,7 +703,6 @@ footer a{color:var(--primary);text-decoration:none;font-weight:700;display:inlin
             <i class="fas fa-shield-alt"></i>
             <span>اطلب الآن</span>
           </div>
-          <span class="subtitle">🛡️ الدفع عند الاستلام • توصيل سريع</span>
         </div>
 
         <div id="bundleOfferBox" class="bundle-offer-box" style="display:none;">
@@ -657,12 +751,20 @@ footer a{color:var(--primary);text-decoration:none;font-weight:700;display:inlin
           <input type="text" id="inputAddress" placeholder="حي / شارع / رقم المنزل" />
         </div>
 
-        <div class="field-group">
+        <div class="field-group" style="margin-bottom:10px;">
           <label><i class="fas fa-truck"></i> طريقة التوصيل</label>
-          <select id="inputDeliveryType">
-            <option value="المنزل">🏠 توصيل للمنزل</option>
-            <option value="مكتب">🏢 استلام من المكتب</option>
-          </select>
+          <div class="delivery-type-group" id="deliveryTypeGroup">
+            <label class="delivery-option active">
+              <input type="radio" name="deliveryType" value="المنزل" checked />
+              <i class="fas fa-home"></i>
+              <span>توصيل للمنزل</span>
+            </label>
+            <label class="delivery-option">
+              <input type="radio" name="deliveryType" value="مكتب" />
+              <i class="fas fa-building"></i>
+              <span>استلام من المكتب</span>
+            </label>
+          </div>
         </div>
 
         <div class="summary-panel">
@@ -724,7 +826,7 @@ footer a{color:var(--primary);text-decoration:none;font-weight:700;display:inlin
       <div class="desc-card" id="reviewsCard" style="display:none;">
         <h3><i class="fas fa-comments"></i> تقييمات العملاء</h3>
         <div class="review-form-box" id="reviewFormBox">
-          <h4>🎉 شكراً لثقتك! ننتظر تقييمك</h4>
+          <h4><i class="fas fa-gift"></i> شكراً لثقتك! ننتظر تقييمك</h4>
           <div class="stars-input" id="starsInput">
             <i class="fas fa-star" data-val="1"></i>
             <i class="fas fa-star" data-val="2"></i>
@@ -766,7 +868,7 @@ footer a{color:var(--primary);text-decoration:none;font-weight:700;display:inlin
 <div class="modal" id="successModal">
   <div class="modal-content">
     <div class="success-icon"><i class="fas fa-check"></i></div>
-    <h2>تم استلام طلبك بنجاح 🎉</h2>
+    <h2>تم استلام طلبك بنجاح</h2>
     <p class="thank-msg" id="modalMessage">—</p>
     <button class="modal-btn modal-btn-close" id="modalCloseBtn">
       <i class="fas fa-times"></i> إغلاق
@@ -941,7 +1043,6 @@ function renderIconHtml(iconType, icon, defaultFa = 'fa-check-circle') {
   return `<i class="fas ${esc(faClass)}"></i>`;
 }
 
-/* ═══════════════ BUNDLE LOGIC ═══════════════ */
 function findCheapestTierForQty(quantity) {
   if (!bundleConfig || !bundleConfig.tiers || !bundleConfig.tiers.length) return null;
   const applicable = bundleConfig.tiers.filter(t => quantity >= t.qty);
@@ -980,6 +1081,11 @@ function getQtyLabel(q) {
   return `${q} قطعة`;
 }
 
+function getDeliveryType() {
+  const checked = document.querySelector('input[name="deliveryType"]:checked');
+  return checked ? checked.value : "المنزل";
+}
+
 function renderBundleBox() {
   const box = $("bundleOfferBox");
   if (!bundleConfig) { box.style.display = "none"; return; }
@@ -995,7 +1101,7 @@ function renderBundleBox() {
     const currentQty = selectedTier ? selectedTier.qty : qty;
     if (currentQty >= bundleConfig.freeShipping.minQty) {
       fsBanner.classList.add("active");
-      $("bundleFreeShippingText").innerHTML = `<strong>🎉 ${esc(bundleConfig.freeShipping.label)}</strong> — تم تفعيله!`;
+      $("bundleFreeShippingText").innerHTML = `<strong>${esc(bundleConfig.freeShipping.label)}</strong> — تم تفعيله!`;
     } else {
       fsBanner.classList.remove("active");
       const remain = bundleConfig.freeShipping.minQty - currentQty;
@@ -1023,11 +1129,11 @@ function renderBundleBox() {
       const isBest = i === bestValueIdx && sorted.length > 1;
       return `
         <div class="bundle-tier-card ${isSelected ? 'selected' : ''}" data-tier-qty="${tier.qty}">
-          ${isBest ? '<div class="best-badge">⭐ الأفضل</div>' : ''}
+          ${isBest ? '<div class="best-badge"><i class="fas fa-star"></i> الأفضل</div>' : ''}
           <div class="tier-qty"><i class="fas fa-gift"></i> ${getQtyLabel(tier.qty)}</div>
           <div class="tier-price">${fmt(tier.totalPrice)}<small> ${storeInfo.currency}</small></div>
           <div class="tier-per-unit">${fmt(perUnit)} ${storeInfo.currency}/قطعة</div>
-          ${savings > 0 ? `<div class="tier-savings">وفّر ${fmt(savings)}</div>` : ''}
+          ${savings > 0 ? `<div class="tier-savings"><i class="fas fa-piggy-bank"></i> وفّر ${fmt(savings)}</div>` : ''}
         </div>
       `;
     }).join('');
@@ -1080,7 +1186,22 @@ function renderPage(landingSettings) {
   document.title = productName + " | " + pageName;
 
   const annText = landing.announcement || landingSettings.announcement;
-  if (annText) { $("announcementBar").style.display = "block"; $("announcementText").textContent = annText; }
+  if (annText) {
+    $("announcementBar").style.display = "block";
+    $("announcementText").textContent = annText;
+    $("announcementText2").textContent = annText;
+
+    /* ✅ كشف لغة النص لتحديد اتجاه الحركة */
+    const arabicRegex = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/;
+    const isArabic = arabicRegex.test(annText);
+    const track = $("marqueeTrack");
+
+    if (isArabic) {
+      track.classList.add("ar");
+    } else {
+      track.classList.remove("ar");
+    }
+  }
 
   $("headerPageName").textContent = pageName;
   const lg = $("headerLogo");
@@ -1143,7 +1264,7 @@ function renderPage(landingSettings) {
     const fs = b.freeShipping && b.freeShipping.enabled ? {
       enabled: true,
       minQty: parseInt(b.freeShipping.minQty) || 0,
-      label: b.freeShipping.label || "🎁 التوصيل مجاني"
+      label: b.freeShipping.label || "🎁 التوصيل علينا"
     } : { enabled: false };
     if (tiers.length || fs.enabled) {
       bundleConfig = {
@@ -1285,7 +1406,6 @@ function findShippingFor(wilaya, deliveryType) {
   return 0;
 }
 
-/* ═══════════════ Update Totals ═══════════════ */
 function updateTotals() {
   const currentQty = selectedTier ? selectedTier.qty : qty;
 
@@ -1304,7 +1424,7 @@ function updateTotals() {
   }
 
   const wilaya = $("inputWilaya").value;
-  const dtype = $("inputDeliveryType").value;
+  const dtype = getDeliveryType();
   const baseShipping = findShippingFor(wilaya, dtype);
   const freeActive = isFreeShippingActive(currentQty);
   activeShippingCost = freeActive ? 0 : baseShipping;
@@ -1315,7 +1435,7 @@ function updateTotals() {
 
   const brShipEl = $("brShipping");
   if (freeActive) {
-    brShipEl.innerHTML = '<span style="color:#059669;font-weight:900;">🎁 مجاني</span>';
+    brShipEl.innerHTML = '<i class="fas fa-gift" style="color:#059669;margin-left:4px;"></i><span style="color:#059669;font-weight:900;">مجاني</span>';
   } else if (!wilaya) {
     brShipEl.innerHTML = '<span style="color:#94a3b8;">اختر الولاية</span>';
   } else if (baseShipping > 0) {
@@ -1343,14 +1463,11 @@ function updateTotals() {
   const realSavings = normalPrice - subtotal;
   if (realSavings > 0) {
     $("savingsAmount").textContent = fmt(realSavings);
-    savingsBadge.style.display = "block";
+    savingsBadge.style.display = "flex";
   } else {
     savingsBadge.style.display = "none";
   }
 
-  /* ═══════════════════════════════════════════════════
-     ✅ شريط التحفيز — عرض السعر الفردي (أرخص نفسياً)
-     ═══════════════════════════════════════════════════ */
   const prog = $("bundleProgress");
   if (bundleConfig && bundleConfig.tiers.length > 0) {
     prog.style.display = "block";
@@ -1369,17 +1486,16 @@ function updateTotals() {
       const willHaveFreeShipping = bundleConfig.freeShipping?.enabled 
         && nextTier.qty >= bundleConfig.freeShipping.minQty;
       
-      /* ✅ عرض السعر الفردي بدل الإجمالي */
-      let html = `📦 أضف <strong>${remainText}</strong> أخرى للاستفادة من سعر <strong>${fmt(perUnit)} ${storeInfo.currency}</strong> للقطعة الواحدة`;
+      let html = `<i class="fas fa-box inline-ico" style="color:#d97706;"></i> أضف <strong>${remainText}</strong> أخرى للاستفادة من سعر <strong>${fmt(perUnit)} ${storeInfo.currency}</strong> للقطعة الواحدة`;
       
       if (willHaveFreeShipping) {
-        html += `<span class="free-hint">مع ${esc(bundleConfig.freeShipping.label)}</span>`;
+        html += `<span class="free-hint"><i class="fas fa-gift"></i> مع ${esc(bundleConfig.freeShipping.label)}</span>`;
       }
       
       prog.innerHTML = html;
     } else if (tierUsed && tierUsed.perUnit < baseUnitPrice) {
       prog.className = "bundle-progress success";
-      prog.innerHTML = `🎉 لقد حصلت على <strong>أفضل عرض متاح</strong> — سعر <strong>${fmt(Math.floor(tierUsed.perUnit))} ${storeInfo.currency}</strong> للقطعة`;
+      prog.innerHTML = `<i class="fas fa-check-circle inline-ico" style="color:#059669;"></i> لقد حصلت على <strong>أفضل عرض متاح</strong> — سعر <strong>${fmt(Math.floor(tierUsed.perUnit))} ${storeInfo.currency}</strong> للقطعة`;
     } else {
       prog.style.display = "none";
     }
@@ -1404,7 +1520,14 @@ function updateTotals() {
 
 function setupCheckout() {
   $("inputWilaya").addEventListener("change", updateTotals);
-  $("inputDeliveryType").addEventListener("change", updateTotals);
+
+  document.querySelectorAll('input[name="deliveryType"]').forEach(radio => {
+    radio.addEventListener('change', () => {
+      document.querySelectorAll('.delivery-option').forEach(opt => opt.classList.remove('active'));
+      radio.closest('.delivery-option').classList.add('active');
+      updateTotals();
+    });
+  });
 
   $("qtyMinus").addEventListener("click", () => {
     if (selectedTier) return;
@@ -1426,7 +1549,15 @@ function setupCheckout() {
   });
 
   $("submitBtn").addEventListener("click", executeOrder);
-  $("floatingOrderBtn").addEventListener("click", () => $("checkoutPanel").scrollIntoView({ behavior: "smooth", block: "start" }));
+
+  $("floatingOrderBtn").addEventListener("click", () => {
+    const target = $("inputName");
+    if (target) {
+      const y = target.getBoundingClientRect().top + window.pageYOffset - 100;
+      window.scrollTo({ top: y, behavior: "smooth" });
+      setTimeout(() => target.focus(), 400);
+    }
+  });
 
   const fp = $("checkoutPanel"), fb = $("floatingBar");
   window.addEventListener("scroll", () => {
@@ -1443,7 +1574,7 @@ async function executeOrder() {
   const wilaya = $("inputWilaya").value;
   const commune = $("inputCommune").value.trim();
   const address = $("inputAddress").value.trim();
-  const deliveryType = $("inputDeliveryType").value;
+  const deliveryType = getDeliveryType();
 
   const currentQty = selectedTier ? selectedTier.qty : qty;
 
@@ -1526,7 +1657,7 @@ async function executeOrder() {
     });
 
     let successMsg = `شكراً لك <strong>${esc(name)}</strong> 🌟<br>تم استلام طلبك وسيتصل بك فريقنا قريباً للتأكيد.`;
-    if (freeActive) successMsg += `<br><span style="color:#059669;font-weight:800;font-size:.85rem;">🎉 ${esc(bundleConfig.freeShipping.label)}</span>`;
+    if (freeActive) successMsg += `<br><span style="color:#059669;font-weight:800;font-size:.85rem;"><i class="fas fa-gift"></i> ${esc(bundleConfig.freeShipping.label)}</span>`;
 
     $("modalMessage").innerHTML = successMsg;
     $("successModal").classList.add("show");
