@@ -135,6 +135,7 @@ header{position:sticky;top:0;z-index:1100;background:rgba(255,255,255,.94);backd
 .location-btn:disabled{opacity:.6}
 .btn-order{width:100%;padding:14px;border:none;border-radius:40px;background:linear-gradient(135deg,#25d366,#128c7e);color:#fff;font-weight:700;font-size:1rem;cursor:pointer;font-family:var(--font);display:flex;align-items:center;justify-content:center;gap:8px}
 .btn-order:disabled{opacity:.5;cursor:not-allowed;background:#94a3b8}
+.btn-order.without-wa{background:linear-gradient(135deg,var(--primary),var(--primary-light))}
 .clear-cart-btn{width:100%;margin-top:8px;background:var(--danger);color:#fff;border:none;padding:10px;border-radius:40px;font-weight:600;cursor:pointer;font-family:var(--font)}
 #cartItemsList{max-height:250px;overflow-y:auto;margin-bottom:12px}
 .cart-item{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:.9rem}
@@ -142,6 +143,10 @@ header{position:sticky;top:0;z-index:1100;background:rgba(255,255,255,.94);backd
 
 #imageModal .modal-content{background:transparent;box-shadow:none;max-width:90%;padding:0;display:flex;justify-content:center;align-items:center}
 #modalImg{max-width:95%;max-height:80vh;border-radius:20px}
+
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--primary);color:#fff;padding:12px 24px;border-radius:40px;font-size:.9rem;z-index:5000;display:none;font-family:var(--font);max-width:90%;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,.2)}
+.toast.show{display:block;animation:toastUp .3s ease}
+@keyframes toastUp{from{opacity:0;transform:translate(-50%,10px)}to{opacity:1;transform:translate(-50%,0)}}
 
 footer{text-align:center;padding:20px 16px;background:#fff;margin-top:20px;font-size:.75rem;color:var(--text-muted);border-top:1px solid var(--border)}
 footer a{color:var(--primary);text-decoration:none;font-weight:600}
@@ -241,7 +246,7 @@ footer a{color:var(--primary);text-decoration:none;font-weight:600}
         </button>
       </div>
       <button class="btn-order" id="sendOrderBtn">
-        <i class="fab fa-whatsapp"></i> <span data-t="sendOrder">إرسال الطلب</span>
+        <i class="fas fa-paper-plane"></i> <span data-t="sendOrder">إرسال الطلب</span>
       </button>
       <button class="clear-cart-btn" id="clearCartBtn" data-t="clearCart">🗑️ مسح السلة</button>
       <button style="width:100%;background:none;border:none;color:var(--text-muted);margin-top:12px;font-weight:600;cursor:pointer;font-family:var(--font);" id="closeCartBtn" data-t="close">إغلاق</button>
@@ -261,7 +266,9 @@ footer a{color:var(--primary);text-decoration:none;font-weight:600}
 
 </div>
 
-<!-- ═══════════════ 🌐 نظام الترجمة (بدون تغيير الاتجاه) ═══════════════ -->
+<div class="toast" id="toastMessage"></div>
+
+<!-- ═══════════════ 🌐 نظام الترجمة ═══════════════ -->
 <script>
 const I18N = {
   ar: {
@@ -315,6 +322,7 @@ const I18N = {
     alertOrdersDisabled: "الطلبات غير مفعّلة",
     alertFillAll: "يرجى ملء جميع البيانات",
     alertOrderError: "خطأ: ",
+    orderSuccess: "✅ تم استلام طلبك بنجاح!",
     noticeConfigMissingTitle: "ملف الإعدادات مفقود",
     noticeConfigMissingMsg: "لم يتم العثور على ملف <code>config.js</code>.",
     noticeConfigIncompleteTitle: "الإعدادات غير مكتملة",
@@ -374,6 +382,7 @@ const I18N = {
     alertOrdersDisabled: "Commandes désactivées",
     alertFillAll: "Veuillez remplir tous les champs",
     alertOrderError: "Erreur : ",
+    orderSuccess: "✅ Votre commande a bien été reçue !",
     noticeConfigMissingTitle: "Fichier de configuration manquant",
     noticeConfigMissingMsg: "Fichier <code>config.js</code> introuvable.",
     noticeConfigIncompleteTitle: "Configuration incomplète",
@@ -393,7 +402,6 @@ function t(key) {
 window.t = t;
 
 function applyTranslations() {
-  /* ✅ لا نغيّر lang/dir — المتجر يبقى RTL دائمًا */
   document.querySelectorAll('[data-t]').forEach(el => {
     const key = el.getAttribute('data-t');
     const val = I18N[LANG][key];
@@ -486,7 +494,7 @@ function normalizeWhatsappNumber(raw) {
   return num;
 }
 
-/* ✅ عرض العملة حسب اللغة: دج (عربي) / DA (فرنسي) */
+/* ✅ عرض العملة حسب اللغة */
 function curLbl() {
   const c = storeInfo.currency || 'دج';
   const lng = window.currentLang || 'ar';
@@ -511,6 +519,15 @@ function getDiscountPrice(disc) {
   return (isNaN(p) || p <= 0) ? null : p;
 }
 
+/* ✅ إشعار Toast */
+function showToast(msg) {
+  const el = $("toastMessage");
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(window._toastT);
+  window._toastT = setTimeout(() => el.classList.remove('show'), 3500);
+}
+
 // ═══════════════ 4) تطبيق معلومات المتجر ═══════════════
 function applyStoreInfo() {
   if (!storeConfigured) {
@@ -533,12 +550,20 @@ function applyStoreInfo() {
     lk.textContent = storeInfo.phoneInvoice;
   } else $("footerPhoneLine").style.display = "none";
 
+  /* ═══════════════════════════════════════════════════
+     ✅ زر الطلب يعمل دائماً — النص والأيقونة يتغيران حسب حالة الواتساب
+     ═══════════════════════════════════════════════════ */
   const sb = $("sendOrderBtn");
-  const ok = storeInfo.enableWhatsapp && storeInfo.whatsappNumber;
-  sb.disabled = !ok;
-  sb.innerHTML = ok
-    ? '<i class="fab fa-whatsapp"></i> <span>' + t('wsBtnEnabled') + '</span>'
-    : '<i class="fas fa-ban"></i> <span>' + t('wsBtnDisabled') + '</span>';
+  sb.disabled = false; /* ← الزر لا يُعطّل أبداً */
+  
+  const waReady = storeInfo.enableWhatsapp && storeInfo.whatsappNumber;
+  if (waReady) {
+    sb.classList.remove('without-wa');
+    sb.innerHTML = '<i class="fab fa-whatsapp"></i> <span>' + t('wsBtnEnabled') + '</span>';
+  } else {
+    sb.classList.add('without-wa');
+    sb.innerHTML = '<i class="fas fa-paper-plane"></i> <span>' + t('sendOrder') + '</span>';
+  }
 
   $("locationBtn").style.display = storeInfo.enableLocation ? "flex" : "none";
   $("cartBtn").classList.add("show");
@@ -944,7 +969,6 @@ $("locationBtn").addEventListener('click', () => {
 
 // ═══════════════ 12) إرسال الطلب ═══════════════
 $("sendOrderBtn").addEventListener('click', async () => {
-  if (!(storeInfo.enableWhatsapp && storeInfo.whatsappNumber)) return alert(t('alertOrdersDisabled'));
   const name = $("custName").value.trim();
   const phone = $("custPhone").value.trim();
   const address = $("custAddress").value.trim();
@@ -953,33 +977,45 @@ $("sendOrderBtn").addEventListener('click', async () => {
   refreshCartPrices();
 
   const total = cart.reduce((a, b) => a + b.price * b.quantity, 0);
-  let itemsText = "";
-  cart.forEach(i => {
-    const detail = (i.qtyPerBox > 1) ? `${i.quantityBoxes}x${i.qtyPerBox} ${i.name}` : `${i.quantity} × ${i.name}`;
-    itemsText += `${detail} × ${i.price} = ${(i.price * i.quantity)}\n`;
-  });
-  let mapsText = "", addressText = "";
-  if (address.includes("maps.google.com")) {
-    const parts = address.split('|');
-    const addr = parts[0].trim();
-    const map = parts.find(p => p.includes("maps.google.com")) || "";
-    if (addr) addressText = `Adresse : ${addr}\n`;
-    if (map) mapsText = `Google maps : ${map.trim()}\n`;
-  } else addressText = `Adresse : ${address}\n`;
 
-  const msg = `\u202ANouvelle demande.\nDe: ${name}\nN°: ${phone}\n${addressText}${mapsText}\n${itemsText}\nTotal: ${total} ${storeInfo.currency||''}\n📅 ${new Date().toLocaleString('fr-FR')}\u202C`;
-
+  /* ✅ حفظ الطلب في Firebase دائماً */
   try {
     await push(ref(db, 'whatsappOrders'), {
       customerName: name, phone, address,
       items: cart.map(i => ({ name: i.name, price: i.price, quantity: i.quantity, quantityBoxes: i.quantityBoxes, qtyPerBox: i.qtyPerBox })),
       totalPrice: total, timestamp: Date.now(), status: "pending"
     });
-    const waNumber = normalizeWhatsappNumber(storeInfo.whatsappNumber);
-    window.open(`https://wa.me/${waNumber}?text=${encodeURIComponent(msg)}`, '_blank');
+
+    /* ✅ إذا واتساب مفعّل + رقم موجود → فتح واتساب */
+    const waReady = storeInfo.enableWhatsapp && storeInfo.whatsappNumber;
+    if (waReady) {
+      let itemsText = "";
+      cart.forEach(i => {
+        const detail = (i.qtyPerBox > 1) ? `${i.quantityBoxes}x${i.qtyPerBox} ${i.name}` : `${i.quantity} × ${i.name}`;
+        itemsText += `${detail} × ${i.price} = ${(i.price * i.quantity)}\n`;
+      });
+      let mapsText = "", addressText = "";
+      if (address.includes("maps.google.com")) {
+        const parts = address.split('|');
+        const addr = parts[0].trim();
+        const map = parts.find(p => p.includes("maps.google.com")) || "";
+        if (addr) addressText = `Adresse : ${addr}\n`;
+        if (map) mapsText = `Google maps : ${map.trim()}\n`;
+      } else addressText = `Adresse : ${address}\n`;
+
+      const msg = `\u202ANouvelle demande.\nDe: ${name}\nN°: ${phone}\n${addressText}${mapsText}\n${itemsText}\nTotal: ${total} ${storeInfo.currency||''}\n📅 ${new Date().toLocaleString('fr-FR')}\u202C`;
+      const waNumber = normalizeWhatsappNumber(storeInfo.whatsappNumber);
+      window.open(`https://wa.me/${waNumber}?text=${encodeURIComponent(msg)}`, '_blank');
+    }
+
+    /* ✅ إشعار النجاح */
+    showToast(t('orderSuccess'));
+
+    /* ✅ تفريغ السلة والحقول */
     cart = []; saveCart();
     $("custName").value = ''; $("custPhone").value = ''; $("custAddress").value = '';
     $("cartModal").classList.remove('show');
+
   } catch (e) { alert(t('alertOrderError') + e.message); }
 });
 
