@@ -340,6 +340,186 @@ footer{text-align:center;padding:16px;background:white;margin-top:30px;font-size
   .bundle-tier-row .tier-field{min-width:70px}
   .bundle-tier-row input[type="number"]{font-size:.75rem!important;padding:6px 8px!important}
 }
+/* ═══════════════════════════════════════════════════════
+   🎨 منتقي الثيمات — قائمة منسدلة أنيقة
+   ═══════════════════════════════════════════════════════ */
+.theme-dropdown{
+  background:#f8fafc;
+  border:1.5px solid #e2e8f0;
+  border-radius:16px;
+  overflow:hidden;
+  margin-bottom:14px;
+}
+.theme-current-btn{
+  width:100%;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:12px 14px;
+  background:#fff;
+  border:none;
+  cursor:pointer;
+  font-family:var(--font);
+  text-align:right;
+  transition:.2s;
+}
+.theme-current-btn:hover{ background:#f8fafc; }
+.theme-current-btn .chevron{
+  margin-right:auto;
+  color:#64748b;
+  transition:transform .25s ease;
+  font-size:.9rem;
+}
+.theme-dropdown.open .theme-current-btn .chevron{
+  transform:rotate(180deg);
+}
+.theme-mini-preview{
+  width:44px;
+  height:38px;
+  border-radius:10px;
+  border:1.5px solid var(--tp-border);
+  background:var(--tp-bg);
+  position:relative;
+  overflow:hidden;
+  flex-shrink:0;
+}
+.theme-mini-preview::before{
+  content:'';
+  position:absolute;
+  top:6px;left:6px;right:6px;
+  height:16px;
+  border-radius:4px;
+  background:var(--tp-card);
+}
+.theme-mini-preview::after{
+  content:'';
+  position:absolute;
+  bottom:5px;left:50%;
+  transform:translateX(-50%);
+  width:60%;
+  height:5px;
+  border-radius:4px;
+  background:var(--tp-primary);
+}
+.theme-current-info{
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+  min-width:0;
+  flex:1;
+}
+.theme-current-info .label{
+  font-size:.68rem;
+  color:#94a3b8;
+  font-weight:700;
+}
+.theme-current-info .name{
+  font-size:.88rem;
+  font-weight:800;
+  color:#0f172a;
+}
+.theme-list{
+  max-height:0;
+  overflow:hidden;
+  transition:max-height .35s ease;
+  background:#f8fafc;
+}
+.theme-dropdown.open .theme-list{
+  max-height:400px;
+  overflow-y:auto;
+  padding:12px;
+  border-top:1px solid #e2e8f0;
+}
+.theme-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(70px,1fr));
+  gap:8px;
+}
+.theme-option{
+  cursor:pointer;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:5px;
+  position:relative;
+}
+.theme-option input[type="radio"]{
+  position:absolute;
+  opacity:0;
+  pointer-events:none;
+}
+.theme-preview{
+  width:100%;
+  aspect-ratio:1/0.85;
+  border-radius:10px;
+  border:2px solid var(--tp-border);
+  background:var(--tp-bg);
+  position:relative;
+  overflow:hidden;
+  transition:.2s ease;
+  box-shadow:0 1px 3px rgba(0,0,0,.04);
+}
+.theme-option:hover .theme-preview{
+  transform:translateY(-2px);
+  box-shadow:0 4px 10px rgba(0,0,0,.1);
+}
+.theme-option input:checked ~ .theme-preview{
+  border-color:var(--tp-primary);
+  box-shadow:0 0 0 2px var(--tp-primary), 0 4px 12px rgba(0,0,0,.15);
+  transform:translateY(-2px);
+}
+.theme-preview .tp-card{
+  position:absolute;
+  top:16%;left:12%;right:12%;
+  height:52%;
+  border-radius:5px;
+  background:var(--tp-card);
+  padding:14% 12%;
+  display:flex;
+  flex-direction:column;
+  gap:8%;
+  box-shadow:0 1px 2px rgba(0,0,0,.05);
+}
+.theme-preview .tp-line{
+  height:6%;min-height:2px;
+  border-radius:3px;
+  background:var(--tp-line);
+  width:100%;
+}
+.theme-preview .tp-line.short{ width:55%; }
+.theme-preview .tp-btn{
+  position:absolute;
+  bottom:9%;left:20%;right:20%;
+  height:11%;min-height:3px;
+  border-radius:20px;
+  background:var(--tp-primary);
+}
+.theme-preview .tp-check{
+  position:absolute;
+  top:4px;left:4px;
+  width:18px;height:18px;
+  border-radius:50%;
+  background:var(--tp-primary);
+  color:#fff;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  font-size:9px;
+  box-shadow:0 2px 5px rgba(0,0,0,.25);
+  z-index:2;
+}
+.theme-option input:checked ~ .theme-preview .tp-check{ display:flex; }
+.theme-label{
+  font-size:.68rem;
+  font-weight:700;
+  color:#64748b;
+  text-align:center;
+  letter-spacing:.2px;
+}
+.theme-option input:checked ~ .theme-label{
+  color:var(--tp-primary);
+  font-weight:800;
+}
 </style>
 </head>
 <body>
@@ -636,6 +816,21 @@ footer{text-align:center;padding:16px;background:white;margin-top:30px;font-size
     <p style="font-size:.78rem;color:var(--muted);margin-bottom:14px;">المنتج الأصلي: <b id="landingEditProductName" style="color:var(--primary);"></b></p>
     <input type="hidden" id="landingEditProductId" />
     <label class="checkbox-group"><input type="checkbox" id="landingEnabled" /><span style="font-weight:700;">تفعيل صفحة الترويج</span></label>
+    
+    <span class="section-label vip"><i class="fas fa-palette"></i> ستايل الصفحة</span>
+<div class="theme-dropdown" id="themeDropdown">
+  <button type="button" class="theme-current-btn" id="themeCurrentBtn">
+    <div class="theme-mini-preview" id="themeCurrentPreview"></div>
+    <div class="theme-current-info">
+      <span class="label">الستايل الحالي</span>
+      <span class="name" id="themeCurrentName">أخضر</span>
+    </div>
+    <i class="fas fa-chevron-down chevron"></i>
+  </button>
+  <div class="theme-list">
+    <div class="theme-grid" id="themePicker"></div>
+  </div>
+</div>
 
     <span class="section-label vip"><i class="fas fa-image"></i> شعار الصفحة</span>
     <div class="helper-text">ارفع شعاراً خاصاً. إذا لم تُضف → شعار المتجر الأساسي يُستخدم.</div>
@@ -979,6 +1174,106 @@ let booted = false;
 let currentOrdersFilter = "new";
 let ordersData = {}, confirmedData = {};
 let currentBundleTiers = [];
+
+/* ═══════════════════════════════════════════════════════
+   🎨 قائمة ثيمات صفحة الترويج
+   ═══════════════════════════════════════════════════════ */
+const PAGE_THEMES = [
+  { id: 'default', name: 'أخضر', bg: '#f8fafc', card: '#ffffff', line: '#a7f3d0', primary: '#0b6e4f', border: '#a7f3d0' },
+  { id: 'white', name: 'أبيض', bg: '#ffffff', card: '#f8fafc', line: '#e2e8f0', primary: '#0b6e4f', border: '#e2e8f0' },
+  { id: 'dark', name: 'داكن', bg: '#0f172a', card: '#1e293b', line: '#334155', primary: '#10b981', border: '#334155' },
+  { id: 'pink', name: 'وردي', bg: '#fdf2f8', card: '#ffffff', line: '#fbcfe8', primary: '#db2777', border: '#fbcfe8' },
+  { id: 'gold', name: 'ذهبي', bg: '#18181b', card: '#27272a', line: '#3f3f46', primary: '#d4af37', border: '#3f3f46' },
+  { id: 'blue', name: 'أزرق', bg: '#eff6ff', card: '#ffffff', line: '#bfdbfe', primary: '#2563eb', border: '#bfdbfe' },
+  { id: 'gray', name: 'رمادي', bg: '#f1f5f9', card: '#ffffff', line: '#cbd5e1', primary: '#475569', border: '#cbd5e1' },
+  { id: 'teal', name: 'تركواز', bg: '#f0fdfa', card: '#ffffff', line: '#99f6e4', primary: '#0d9488', border: '#99f6e4' },
+  { id: 'purple', name: 'بنفسجي', bg: '#faf5ff', card: '#ffffff', line: '#e9d5ff', primary: '#7c3aed', border: '#e9d5ff' },
+  { id: 'orange', name: 'برتقالي', bg: '#fff7ed', card: '#ffffff', line: '#fed7aa', primary: '#ea580c', border: '#fed7aa' },
+  { id: 'red', name: 'أحمر', bg: '#fef2f2', card: '#ffffff', line: '#fecaca', primary: '#dc2626', border: '#fecaca' },
+  { id: 'navy', name: 'كحلي', bg: '#1e293b', card: '#334155', line: '#475569', primary: '#38bdf8', border: '#475569' },
+  { id: 'cream', name: 'كريمي', bg: '#fefce8', card: '#ffffff', line: '#fde68a', primary: '#a16207', border: '#fde68a' },
+  { id: 'lime', name: 'ليموني', bg: '#f7fee7', card: '#ffffff', line: '#d9f99d', primary: '#65a30d', border: '#d9f99d' },
+  { id: 'brown', name: 'بني', bg: '#faf5f0', card: '#ffffff', line: '#e7d4c3', primary: '#78350f', border: '#e7d4c3' }
+];
+
+/* ✅ رسم منتقي الثيمات */
+/* ✅ رسم منتقي الثيمات (قائمة منسدلة) */
+function renderThemePicker(currentTheme) {
+  const c = $("themePicker");
+  if (!c) return;
+  const current = currentTheme || 'default';
+  
+  /* بناء شبكة الثيمات */
+  c.innerHTML = PAGE_THEMES.map(t => `
+    <label class="theme-option" style="
+      --tp-bg:${t.bg};
+      --tp-card:${t.card};
+      --tp-line:${t.line};
+      --tp-primary:${t.primary};
+      --tp-border:${t.border};
+    ">
+      <input type="radio" name="pageTheme" value="${t.id}" ${current === t.id ? 'checked' : ''} />
+      <div class="theme-preview">
+        <div class="tp-card">
+          <div class="tp-line"></div>
+          <div class="tp-line short"></div>
+        </div>
+        <div class="tp-btn"></div>
+        <div class="tp-check"><i class="fas fa-check"></i></div>
+      </div>
+      <span class="theme-label">${t.name}</span>
+    </label>
+  `).join('');
+  
+  /* تحديث زر العرض الحالي */
+  const found = PAGE_THEMES.find(x => x.id === current) || PAGE_THEMES[0];
+  const preview = $("themeCurrentPreview");
+  const nameEl = $("themeCurrentName");
+  if (preview) {
+    preview.style.setProperty('--tp-bg', found.bg);
+    preview.style.setProperty('--tp-card', found.card);
+    preview.style.setProperty('--tp-line', found.line);
+    preview.style.setProperty('--tp-primary', found.primary);
+    preview.style.setProperty('--tp-border', found.border);
+  }
+  if (nameEl) nameEl.textContent = found.name;
+  
+  /* إغلاق القائمة عند فتح النافذة */
+  const dd = $("themeDropdown");
+  if (dd) dd.classList.remove('open');
+  
+  /* ✅ عند اختيار ثيم: تحديث العرض + الإغلاق التلقائي */
+  c.querySelectorAll('input[name="pageTheme"]').forEach(inp => {
+    inp.addEventListener('change', function() {
+      const sel = PAGE_THEMES.find(x => x.id === this.value);
+      if (sel && preview && nameEl) {
+        preview.style.setProperty('--tp-bg', sel.bg);
+        preview.style.setProperty('--tp-card', sel.card);
+        preview.style.setProperty('--tp-line', sel.line);
+        preview.style.setProperty('--tp-primary', sel.primary);
+        preview.style.setProperty('--tp-border', sel.border);
+        nameEl.textContent = sel.name;
+      }
+      setTimeout(() => { if (dd) dd.classList.remove('open'); }, 180);
+    });
+  });
+}
+
+/* ✅ فتح/إغلاق قائمة الثيمات */
+document.addEventListener('DOMContentLoaded', () => {
+  const btn = $("themeCurrentBtn");
+  const dd = $("themeDropdown");
+  if (btn && dd) {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      dd.classList.toggle('open');
+    });
+    /* إغلاق عند النقر خارج القائمة */
+    document.addEventListener('click', e => {
+      if (!dd.contains(e.target)) dd.classList.remove('open');
+    });
+  }
+});
 
 const PERMS = {
   owner: {
@@ -1769,6 +2064,8 @@ function openLandingEditModal(id) {
   $("landingEditProductName").textContent = p.name;
   const l = p.landing || {};
   $("landingEnabled").checked = l.enabled === true;
+  /* ✅ تحميل الثيم الحالي */
+renderThemePicker(l.theme || 'default');
   $("landingPageName").value = l.pageName || "";
   $("landingProductName").value = l.productName || "";
   $("landingPrice").value = (l.price !== undefined && l.price !== null && Number(l.price) > 0) ? l.price : "";
@@ -2044,7 +2341,9 @@ $("saveLandingBtn").addEventListener('click', async () => {
   const tiktokPixelId = $("landingItemTiktokPixel").value.trim();
   const showReviews = $("landingShowReviews").checked;
   const showVisitors = $("landingShowVisitors").checked;
-
+/* ✅ قراءة الثيم المختار */
+const themeEl = document.querySelector('input[name="pageTheme"]:checked');
+const theme = themeEl ? themeEl.value : 'default';
   /* ═══ الحزم والتوصيل المجاني ═══ */
   const bundleEnabled = $("landingBundleEnabled").checked;
   const bundleMaxQty = parseInt($("landingBundleMaxQty").value) || 0;
@@ -2080,9 +2379,9 @@ $("saveLandingBtn").addEventListener('click', async () => {
   }
 
   const landingData = {
-    enabled, pageName: pageName || null, productName: productName || null,
-    logo: currentLandingLogo || null,
-    price: (!isNaN(customPrice) && customPrice > 0) ? customPrice : null,
+  enabled, theme, pageName: pageName || null, productName: productName || null,
+  logo: currentLandingLogo || null,
+  price: (!isNaN(customPrice) && customPrice > 0) ? customPrice : null,
     announcement: announcement || null, description: description || null,
     images: images, features: features.length ? features : null,
     pixelId: pixelId || null, tiktokPixelId: tiktokPixelId || null,
